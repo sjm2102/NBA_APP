@@ -159,3 +159,103 @@ button:hover {
     font-size: 12px;
   }
 }
+
+/* ===============================
+   MOBILE OPTIMIZATION
+   =============================== */
+
+@media (max-width: 900px) {
+
+  /* Layout */
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 12px;
+  }
+
+  .panel {
+    border-radius: 14px;
+  }
+
+  .panel-head h2 {
+    font-size: 16px;
+  }
+
+  /* Filters stack cleanly */
+  .filters {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .filters input,
+  .filters select,
+  .filters button {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  /* Tables */
+  .tabulator {
+    font-size: 13px !important;
+  }
+
+  .tabulator-header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+
+  /* Row spacing */
+  .tabulator-row {
+    min-height: 44px;
+  }
+
+  /* Horizontal scroll ONLY inside tables */
+  .tabulator-tableHolder {
+    overflow-x: auto !important;
+  }
+
+  /* Hide less important columns on mobile */
+  .tabulator-col[data-field="Opponent"],
+  .tabulator-col[data-field="Odds"],
+  .tabulator-col[data-field="Team"] {
+    display: none !important;
+  }
+
+  .tabulator-cell[data-field="Opponent"],
+  .tabulator-cell[data-field="Odds"],
+  .tabulator-cell[data-field="Team"] {
+    display: none !important;
+  }
+
+  /* Emphasize key info */
+  .tabulator-cell[data-field="Player"] {
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .tabulator-cell[data-field="best_edge"] {
+    font-weight: 700;
+    color: #6CFF8D;
+  }
+
+  .tabulator-cell[data-field="best_side"] {
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  /* Top bar */
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .top-controls {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+}
