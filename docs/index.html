@@ -5,122 +5,92 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>NBA Bets Dashboard</title>
 
-  <!-- Tabulator (table + filters) -->
+  <!-- Tabulator -->
   <link href="https://unpkg.com/tabulator-tables@6.2.5/dist/css/tabulator.min.css" rel="stylesheet">
-
   <link rel="stylesheet" href="./styles.css" />
 </head>
+
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <div class="logo">🏀</div>
-      <div>
-        <div class="title">NBA Bets Dashboard</div>
-        <div class="subtitle">Moneyline + Player Lines (Points / PA / PRA)</div>
+<header class="topbar">
+  <div>
+    <h1>NBA Bets Dashboard</h1>
+    <div class="subtitle">Moneyline + Player Props (Points / PA / PRA)</div>
+  </div>
+  <button onclick="location.reload()">Reload data</button>
+</header>
+
+<main class="container">
+
+  <!-- MONEYLINE -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Moneyline</h2>
+      <div class="filters">
+        <input id="mlSearch" class="input" placeholder="Search team…" />
+        <input id="mlMinProb" class="input" type="number" step="0.01" value="0.60" />
+        <button id="mlClear">Clear</button>
       </div>
     </div>
-    <div class="right">
-      <div id="meta" class="meta">Loading…</div>
-      <button id="refreshBtn" class="btn">Reload data</button>
-    </div>
-  </header>
+    <div id="tblMoneyline"></div>
+  </section>
 
-  <main class="container">
-    <section class="grid">
-      <!-- Moneyline -->
-      <article class="panel">
-        <div class="panel-head">
-          <h2>Moneyline</h2>
-          <div class="filters">
-            <input id="mlSearch" class="input" placeholder="Search team (away/home/best)…" />
-            <label class="label">
-              Min prob
-              <input id="mlMinProb" class="input small" type="number" step="0.01" min="0" max="1" value="0.60" />
-            </label>
-            <button id="mlClear" class="btn ghost">Clear</button>
-          </div>
-        </div>
-        <div id="tblMoneyline" class="table"></div>
-      </article>
-
-      <!-- Points -->
-      <article class="panel">
-        <div class="panel-head">
-          <h2>Points Lines</h2>
-          <div class="filters">
-            <input id="ptSearch" class="input" placeholder="Search player/team/opponent…" />
-            <select id="ptTeam" class="input select"></select>
-            <select id="ptOpp" class="input select"></select>
-            <select id="ptSide" class="input select">
-              <option value="">Side (Any)</option>
-              <option value="OVER">OVER</option>
-              <option value="UNDER">UNDER</option>
-            </select>
-            <label class="label">
-              Min edge
-              <input id="ptMinEdge" class="input small" type="number" step="0.01" value="0.03" />
-            </label>
-            <button id="ptClear" class="btn ghost">Clear</button>
-          </div>
-        </div>
-        <div id="tblPoints" class="table"></div>
-      </article>
-
-      <!-- PA -->
-      <article class="panel">
-        <div class="panel-head">
-          <h2>PA (Points + Assists)</h2>
-          <div class="filters">
-            <input id="paSearch" class="input" placeholder="Search player/team/opponent…" />
-            <select id="paTeam" class="input select"></select>
-            <select id="paOpp" class="input select"></select>
-            <select id="paSide" class="input select">
-              <option value="">Side (Any)</option>
-              <option value="OVER">OVER</option>
-              <option value="UNDER">UNDER</option>
-            </select>
-            <label class="label">
-              Min edge
-              <input id="paMinEdge" class="input small" type="number" step="0.01" value="0.03" />
-            </label>
-            <button id="paClear" class="btn ghost">Clear</button>
-          </div>
-        </div>
-        <div id="tblPA" class="table"></div>
-      </article>
-
-      <!-- PRA -->
-      <article class="panel">
-        <div class="panel-head">
-          <h2>PRA (Points + Rebounds + Assists)</h2>
-          <div class="filters">
-            <input id="praSearch" class="input" placeholder="Search player/team/opponent…" />
-            <select id="praTeam" class="input select"></select>
-            <select id="praOpp" class="input select"></select>
-            <select id="praSide" class="input select">
-              <option value="">Side (Any)</option>
-              <option value="OVER">OVER</option>
-              <option value="UNDER">UNDER</option>
-            </select>
-            <label class="label">
-              Min edge
-              <input id="praMinEdge" class="input small" type="number" step="0.01" value="0.03" />
-            </label>
-            <button id="praClear" class="btn ghost">Clear</button>
-          </div>
-        </div>
-        <div id="tblPRA" class="table"></div>
-      </article>
-    </section>
-
-    <footer class="footer">
-      <div>
-        Tip: Click any column header to sort. Use the filters to quickly find +EV edges.
+  <!-- POINTS -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Points</h2>
+      <div class="filters">
+        <input id="ptSearch" class="input" placeholder="Search player/team…" />
+        <select id="ptSide" class="input">
+          <option value="">Side (Any)</option>
+          <option value="OVER">OVER</option>
+          <option value="UNDER">UNDER</option>
+        </select>
+        <input id="ptMinEdge" class="input" type="number" step="0.01" value="0.03" />
+        <button id="ptClear">Clear</button>
       </div>
-    </footer>
-  </main>
+    </div>
+    <div id="tblPoints"></div>
+  </section>
 
-  <script src="https://unpkg.com/tabulator-tables@6.2.5/dist/js/tabulator.min.js"></script>
-  <script src="./app.js"></script>
+  <!-- PA -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2>PA (Points + Assists)</h2>
+      <div class="filters">
+        <input id="paSearch" class="input" placeholder="Search player/team…" />
+        <select id="paSide" class="input">
+          <option value="">Side (Any)</option>
+          <option value="OVER">OVER</option>
+          <option value="UNDER">UNDER</option>
+        </select>
+        <input id="paMinEdge" class="input" type="number" step="0.01" value="0.03" />
+        <button id="paClear">Clear</button>
+      </div>
+    </div>
+    <div id="tblPA"></div>
+  </section>
+
+  <!-- PRA -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2>PRA (Points + Rebounds + Assists)</h2>
+      <div class="filters">
+        <input id="praSearch" class="input" placeholder="Search player/team…" />
+        <select id="praSide" class="input">
+          <option value="">Side (Any)</option>
+          <option value="OVER">OVER</option>
+          <option value="UNDER">UNDER</option>
+        </select>
+        <input id="praMinEdge" class="input" type="number" step="0.01" value="0.03" />
+        <button id="praClear">Clear</button>
+      </div>
+    </div>
+    <div id="tblPRA"></div>
+  </section>
+
+</main>
+
+<script src="https://unpkg.com/tabulator-tables@6.2.5/dist/js/tabulator.min.js"></script>
+<script src="./app.js"></script>
 </body>
 </html>
