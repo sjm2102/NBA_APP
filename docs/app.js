@@ -12,14 +12,22 @@ function buildMoneylineTable(el, data) {
   return new Tabulator(el, {
     data,
     layout: "fitColumns",
-    initialSort: [{ column: "ml_best_prob", dir: "desc" }],
+    initialSort: [{ column: "home_win_prob", dir: "desc" }],
     columns: [
       { title: "Away", field: "away" },
       { title: "Home", field: "home" },
-      { title: "Best", field: "ml_best_team" },
-      { title: "Best Prob", field: "ml_best_prob", formatter: c => pct(c.getValue()) },
-      { title: "Home Prob", field: "home_win_prob", formatter: c => pct(c.getValue()) },
-      { title: "Away Prob", field: "away_win_prob", formatter: c => pct(c.getValue()) }
+      {
+        title: "Home Win %",
+        field: "home_win_prob",
+        formatter: c => pct(c.getValue()),
+        hozAlign: "right"
+      },
+      {
+        title: "Away Win %",
+        field: "away_win_prob",
+        formatter: c => pct(c.getValue()),
+        hozAlign: "right"
+      }
     ]
   });
 }
