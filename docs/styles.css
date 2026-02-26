@@ -1,156 +1,117 @@
-/* styles.css */
-:root{
+/* ===============================
+   GLOBAL THEME (Readable Dark UI)
+   =============================== */
+
+:root {
   --bg: #0b1020;
-  --panel: rgba(255,255,255,0.06);
-  --panel2: rgba(255,255,255,0.08);
-  --border: rgba(255,255,255,0.12);
-  --text: rgba(255,255,255,0.92);
-  --muted: rgba(255,255,255,0.65);
-  --shadow: 0 18px 50px rgba(0,0,0,0.35);
-  --radius: 18px;
+  --panel: #141a2e;
+  --panel-header: #1b2340;
+  --border: #2a335c;
+  --text: #e9ecf5;
+  --muted: #aab0d6;
+  --accent: #4da3ff;
 }
 
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
-  color:var(--text);
-  background:
-    radial-gradient(1200px 800px at 15% 10%, rgba(88, 164, 255, 0.22), transparent 60%),
-    radial-gradient(1200px 800px at 85% 10%, rgba(255, 132, 183, 0.18), transparent 60%),
-    radial-gradient(900px 600px at 50% 90%, rgba(127, 255, 212, 0.10), transparent 60%),
-    var(--bg);
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  background: radial-gradient(circle at top, #1b2447, #060a18);
+  color: var(--text);
 }
 
-.topbar{
-  position: sticky;
-  top:0;
-  z-index: 5;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--border);
-  background: rgba(8, 12, 24, 0.75);
-  backdrop-filter: blur(10px);
-}
+/* ===============================
+   PANELS
+   =============================== */
 
-.brand{display:flex; gap:12px; align-items:center}
-.logo{
-  width:42px; height:42px;
-  display:grid; place-items:center;
-  border-radius: 12px;
-  background: var(--panel2);
-  border: 1px solid var(--border);
-}
-.title{font-weight: 800; letter-spacing: 0.2px}
-.subtitle{font-size: 12px; color: var(--muted); margin-top: 2px}
-
-.right{display:flex; gap:10px; align-items:center}
-.meta{font-size:12px; color: var(--muted)}
-
-.container{max-width: 1400px; margin: 0 auto; padding: 18px}
-.grid{
-  display:grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-}
-
-@media (min-width: 1100px){
-  .grid{grid-template-columns: 1fr 1fr;}
-}
-
-.panel{
+.panel {
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0,0,0,.45);
 }
 
-.panel-head{
-  padding: 14px 14px 10px 14px;
+.panel-head {
+  background: var(--panel-header);
+  padding: 12px 14px;
   border-bottom: 1px solid var(--border);
-  background: rgba(255,255,255,0.03);
 }
 
-.panel h2{margin:0 0 10px 0; font-size: 16px}
-
-.filters{
-  display:flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items: center;
+.panel h2 {
+  margin: 0;
+  font-size: 15px;
+  color: #ffffff;
 }
 
-.input{
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: rgba(255,255,255,0.04);
+/* ===============================
+   INPUTS / FILTERS
+   =============================== */
+
+.input,
+select,
+button {
+  background: #0f1430;
   color: var(--text);
-  outline: none;
-  min-width: 210px;
-}
-
-.input.small{min-width: 120px}
-.input.select{min-width: 160px}
-
-.label{
-  display:flex;
-  gap: 8px;
-  align-items: center;
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.btn{
-  padding: 10px 12px;
-  border-radius: 12px;
   border: 1px solid var(--border);
-  background: rgba(255,255,255,0.08);
-  color: var(--text);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+button {
   cursor: pointer;
 }
-.btn:hover{background: rgba(255,255,255,0.12)}
-.btn.ghost{background: rgba(255,255,255,0.04)}
-.btn.ghost:hover{background: rgba(255,255,255,0.08)}
 
-.table{padding: 10px}
-
-/* Tabulator theme tweaks */
-.tabulator{
-  border: 1px solid var(--border) !important;
-  border-radius: 14px;
-  overflow: hidden;
-  background: rgba(0,0,0,0.18);
-}
-.tabulator .tabulator-header{
-  background: rgba(255,255,255,0.06);
-  border-bottom: 1px solid var(--border);
-}
-.tabulator .tabulator-header .tabulator-col{
-  background: transparent;
-  color: var(--text);
-  border-right: 1px solid rgba(255,255,255,0.08);
-}
-.tabulator .tabulator-row{
-  background: rgba(255,255,255,0.02);
-  color: var(--text);
-}
-.tabulator .tabulator-row:nth-child(even){
-  background: rgba(255,255,255,0.03);
-}
-.tabulator .tabulator-footer{
-  background: rgba(255,255,255,0.04);
-  border-top: 1px solid var(--border);
-  color: var(--muted);
+button:hover {
+  background: #1a2146;
 }
 
-.footer{
-  margin-top: 14px;
-  color: var(--muted);
-  font-size: 12px;
+/* ===============================
+   TABULATOR FIXES (IMPORTANT)
+   =============================== */
+
+.tabulator {
+  background: #0f1430 !important;
+  color: var(--text) !important;
+  border: none !important;
+}
+
+/* Header */
+.tabulator-header {
+  background: #1a2146 !important;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+.tabulator-col {
+  background: #1a2146 !important;
+  color: #ffffff !important;
+  border-right: 1px solid var(--border) !important;
+}
+
+/* Rows */
+.tabulator-row {
+  background: #0f1430 !important;
+  color: var(--text) !important;
+}
+
+.tabulator-row:nth-child(even) {
+  background: #121a3a !important;
+}
+
+/* Hover */
+.tabulator-row:hover {
+  background: #1f2a5a !important;
+}
+
+/* Cells */
+.tabulator-cell {
+  color: var(--text) !important;
+  border-right: 1px solid #1f2a5a !important;
+}
+
+/* Pagination */
+.tabulator-footer {
+  background: #141a2e !important;
+  color: var(--muted) !important;
+}
   text-align: center;
 }
