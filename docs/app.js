@@ -29,6 +29,12 @@ function num(x, d = 3) {
   return Number.isFinite(n) ? n.toFixed(d) : "";
 }
 
+/* 🔥 Flame column formatter: show flame if prob > 0.80 */
+function flameFormatter(cell) {
+  const v = Number(cell.getValue());
+  return Number.isFinite(v) && v >= 0.80 ? "🔥" : "";
+}
+
 /* =========================
    NORMALIZE DATA
    ========================= */
@@ -40,7 +46,12 @@ function normalizeMoneyline(rows) {
     home_win_prob:
       r.home_win_prob ?? r.homeProb ?? r.HomeProb ?? r.home_prob ?? "",
     away_win_prob:
-      r.away_win_prob ?? r.awayProb ?? r.AwayProb ?? r.away_prob ?? ""
+      r.away_win_prob ?? r.awayProb ?? r.AwayProb ?? r.away_prob ?? "",
+    // For flame logic on moneyline: use the higher of home/away win probs
+    ml_best_prob: Math.max(
+      Number(r.home_win_prob ?? r.homeProb ?? r.HomeProb ?? r.home_prob ?? 0) || 0,
+      Number(r.away_win_prob ?? r.awayProb ?? r.AwayProb ?? r.away_prob ?? 0) || 0
+    )
   }));
 }
 
@@ -66,24 +77,13 @@ function buildMoneylineTable(el, data) {
     layout: "fitColumns",
     responsiveLayout: false,
     height: "100%",
-    initialSort: [{ column: "home_win_prob", dir: "desc" }],
+    initialSort: [{ column: "ml_best_prob", dir: "desc" }],
     columns: [
-      { title: "Away", field: "away", minWidth: 120, widthGrow: 2 },
-      { title: "Home", field: "home", minWidth: 120, widthGrow: 2 },
-      {
-        title: "Home Win %",
-        field: "home_win_prob",
-        formatter: c => pct(c.getValue()),
-        hozAlign: "right",
-        width: 120
-      },
-      {
-        title: "Away Win %",
-        field: "away_win_prob",
-        formatter: c => pct(c.getValue()),
-        hozAlign: "right",
-        width: 120
-      }
+      { title: "🔥", field: "ml_best_prob", formatter: flameFormatter, hozAlign: "center", width: 50, headerSort: false },
+      { title: "Away", field: "away", widthGrow: 1 },
+      { title: "Home", field: "home", widthGrow: 1 },
+      { title: "Home Win %", field: "home_win_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1 },
+      { title: "Away Win %", field: "away_win_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1 }
     ]
   });
 }
@@ -96,32 +96,14 @@ function buildLinesTable(el, data) {
     height: "100%",
     initialSort: [{ column: "best_edge", dir: "desc" }],
     columns: [
-      { title: "Player", field: "Player", minWidth: 180, widthGrow: 4 },
-      { title: "Team", field: "Team", width: 80 },
-      { title: "Opp", field: "Opponent", width: 80 },
-      { title: "Line", field: "line", hozAlign: "right", width: 80 },
-      {
-        title: "Model %",
-        field: "best_prob",
-        formatter: c => pct(c.getValue()),
-        hozAlign: "right",
-        width: 100
-      },
-      {
-        title: "Edge",
-        field: "best_edge",
-        formatter: c => num(c.getValue(), 3),
-        hozAlign: "right",
-        width: 90
-      },
-      {
-        title: "EV / $1",
-        field: "best_ev_$1",
-        formatter: c => num(c.getValue(), 3),
-        hozAlign: "right",
-        minWidth: 100,
-        widthGrow: 2
-      }
+      { title: "🔥", field: "best_prob", formatter: flameFormatter, hozAlign: "center", width: 50, headerSort: false },
+      { title: "Player", field: "Player", widthGrow: 1 },
+      { title: "Team", field: "Team", widthGrow: 1 },
+      { title: "Opp", field: "Opponent", widthGrow: 1 },
+      { title: "Line", field: "line", hozAlign: "right", widthGrow: 1 },
+      { title: "Model %", field: "best_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1 },
+      { title: "Edge", field: "best_edge", formatter: c => num(c.getValue(), 3), hozAlign: "right", widthGrow: 1 },
+      { title: "EV / $1", field: "best_ev_$1", formatter: c => num(c.getValue(), 3), hozAlign: "right", widthGrow: 1 }
     ]
   });
 }
@@ -164,6 +146,7 @@ function switchView(viewId, title, hint, table) {
 
   activeTable = table;
   setTimeout(() => table.redraw(true), 50);
+  applyGlobalSearch(document.getElementById("globalSearch").value || "");
 }
 
 /* =========================
@@ -188,7 +171,7 @@ async function init() {
   const paTable = buildLinesTable("#tblPA", paData);
   const praTable = buildLinesTable("#tblPRA", praData);
 
-  // Default view
+  // Default view: Moneyline Bets
   activeTable = mlTable;
 
   // Tab buttons
@@ -196,13 +179,13 @@ async function init() {
     btn.addEventListener("click", () => {
       const v = btn.dataset.view;
       if (v === "moneyline")
-        switchView("moneyline", "Predictions", "Moneyline model win probabilities", mlTable);
+        switchView("moneyline", "Moneyline Bets", "Moneyline model win probabilities", mlTable);
       if (v === "points")
-        switchView("points", "RW Projections", "Points projections", ptTable);
+        switchView("points", "Points Lines", "Points lines edges & EV", ptTable);
       if (v === "pa")
-        switchView("pa", "Hit Rates", "Points + Assists", paTable);
+        switchView("pa", "Points + Assists", "PA edges & EV", paTable);
       if (v === "pra")
-        switchView("pra", "Lines", "Points + Rebounds + Assists", praTable);
+        switchView("pra", "Points + Rebounds + Assists", "PRA edges & EV", praTable);
     });
   });
 
