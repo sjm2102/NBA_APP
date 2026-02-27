@@ -29,7 +29,14 @@ function num(x, d = 3) {
   return Number.isFinite(n) ? n.toFixed(d) : "";
 }
 
-/* 🔥 Flame column formatter: show flame if prob > 0.80 */
+function oddsFmt(x) {
+  if (x === null || x === undefined || x === "") return "";
+  const n = Number(x);
+  // Keep odds as-is if numeric; otherwise show string
+  return Number.isFinite(n) ? String(Math.trunc(n)) : String(x);
+}
+
+/* 🔥 Flame cell formatter: show flame if prob >= 0.80 */
 function flameFormatter(cell) {
   const v = Number(cell.getValue());
   return Number.isFinite(v) && v >= 0.80 ? "🔥" : "";
@@ -40,19 +47,32 @@ function flameFormatter(cell) {
    ========================= */
 
 function normalizeMoneyline(rows) {
-  return (rows || []).map(r => ({
-    away: r.away ?? r.Away ?? "",
-    home: r.home ?? r.Home ?? "",
-    home_win_prob:
-      r.home_win_prob ?? r.homeProb ?? r.HomeProb ?? r.home_prob ?? "",
-    away_win_prob:
-      r.away_win_prob ?? r.awayProb ?? r.AwayProb ?? r.away_prob ?? "",
-    // For flame logic on moneyline: use the higher of home/away win probs
-    ml_best_prob: Math.max(
-      Number(r.home_win_prob ?? r.homeProb ?? r.HomeProb ?? r.home_prob ?? 0) || 0,
-      Number(r.away_win_prob ?? r.awayProb ?? r.AwayProb ?? r.away_prob ?? 0) || 0
-    )
-  }));
+  return (rows || []).map(r => {
+    const away = r.away ?? r.Away ?? "";
+    const home = r.home ?? r.Home ?? "";
+
+    const homeP = Number(r.home_win_prob ?? r.homeProb ?? r.HomeProb ?? r.home_prob ?? 0) || 0;
+    const awayP = Number(r.away_win_prob ?? r.awayProb ?? r.AwayProb ?? r.away_prob ?? 0) || 0;
+
+    // Try multiple possible field names for best team
+    const bestTeam =
+      r.ml_best_team ??
+      r.ml_best ??
+      r.best_team ??
+      r.best ??
+      r["Best"] ??
+      (homeP >= awayP ? home : away);
+
+    return {
+      away,
+      home,
+      home_win_prob: r.home_win_prob ?? r.homeProb ?? r.HomeProb ?? r.home_prob ?? "",
+      away_win_prob: r.away_win_prob ?? r.awayProb ?? r.AwayProb ?? r.away_prob ?? "",
+      ml_best_team: bestTeam,
+      // flame logic on moneyline: max(home, away)
+      ml_best_prob: Math.max(homeP, awayP),
+    };
+  });
 }
 
 function normalizeLines(rows) {
@@ -61,9 +81,13 @@ function normalizeLines(rows) {
     Team: r.Team ?? r.team ?? "",
     Opponent: r.Opponent ?? r.opponent ?? "",
     line: r.line ?? r.Line ?? "",
-    best_prob: r.best_prob ?? r.model_prob ?? r.bestProb ?? "",
+    best_prob: r.best_prob ?? r.model_prob ?? r.bestProb ?? r["Model Prob"] ?? "",
     best_edge: r.best_edge ?? r.edge ?? r.bestEdge ?? "",
-    best_ev_$1: r["best_ev_$1"] ?? r.ev_$1 ?? r.bestEV ?? ""
+    best_ev_$1: r["best_ev_$1"] ?? r.ev_$1 ?? r.bestEV ?? "",
+    // NEW requested fields (assumed present in JSON)
+    odds_under: r.odds_under ?? r.under_odds ?? r.oddsU ?? r["Odds Under"] ?? "",
+    odds_over: r.odds_over ?? r.over_odds ?? r.oddsO ?? r["Odds Over"] ?? "",
+    season_mean: r.season_mean ?? r.mean ?? r.avg ?? r["Season Mean"] ?? "",
   }));
 }
 
@@ -79,12 +103,36 @@ function buildMoneylineTable(el, data) {
     height: "100%",
     initialSort: [{ column: "ml_best_prob", dir: "desc" }],
     columns: [
-      { title: "🔥", field: "ml_best_prob", formatter: flameFormatter, hozAlign: "center", width: 50, headerSort: false },
+      {
+        title: "",
+        field: "ml_best_prob",
+        formatter: flameFormatter,
+        headerFormatter: () => "",
+        hozAlign: "center",
+        width: 50,
+        headerSort: false,
+      },
       { title: "Away", field: "away", widthGrow: 1 },
       { title: "Home", field: "home", widthGrow: 1 },
-      { title: "Home Win %", field: "home_win_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1 },
-      { title: "Away Win %", field: "away_win_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1 }
-    ]
+
+      // ✅ NEW
+      { title: "Best", field: "ml_best_team", widthGrow: 1 },
+
+      {
+        title: "Home Win %",
+        field: "home_win_prob",
+        formatter: c => pct(c.getValue()),
+        hozAlign: "right",
+        widthGrow: 1,
+      },
+      {
+        title: "Away Win %",
+        field: "away_win_prob",
+        formatter: c => pct(c.getValue()),
+        hozAlign: "right",
+        widthGrow: 1,
+      },
+    ],
   });
 }
 
@@ -96,15 +144,29 @@ function buildLinesTable(el, data) {
     height: "100%",
     initialSort: [{ column: "best_edge", dir: "desc" }],
     columns: [
-      { title: "🔥", field: "best_prob", formatter: flameFormatter, hozAlign: "center", width: 50, headerSort: false },
+      {
+        title: "",
+        field: "best_prob",
+        formatter: flameFormatter,
+        headerFormatter: () => "",
+        hozAlign: "center",
+        width: 50,
+        headerSort: false,
+      },
       { title: "Player", field: "Player", widthGrow: 1 },
       { title: "Team", field: "Team", widthGrow: 1 },
       { title: "Opp", field: "Opponent", widthGrow: 1 },
       { title: "Line", field: "line", hozAlign: "right", widthGrow: 1 },
+
+      // ✅ NEW
+      { title: "Season Mean", field: "season_mean", formatter: c => num(c.getValue(), 2), hozAlign: "right", widthGrow: 1 },
+      { title: "Odds O", field: "odds_over", formatter: c => oddsFmt(c.getValue()), hozAlign: "right", widthGrow: 1 },
+      { title: "Odds U", field: "odds_under", formatter: c => oddsFmt(c.getValue()), hozAlign: "right", widthGrow: 1 },
+
       { title: "Model %", field: "best_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1 },
       { title: "Edge", field: "best_edge", formatter: c => num(c.getValue(), 3), hozAlign: "right", widthGrow: 1 },
-      { title: "EV / $1", field: "best_ev_$1", formatter: c => num(c.getValue(), 3), hozAlign: "right", widthGrow: 1 }
-    ]
+      { title: "EV / $1", field: "best_ev_$1", formatter: c => num(c.getValue(), 3), hozAlign: "right", widthGrow: 1 },
+    ],
   });
 }
 
@@ -124,9 +186,11 @@ function applyGlobalSearch(query) {
   }
 
   activeTable.setFilter(row => {
-    return ["Player", "Team", "Opponent", "away", "home"].some(k =>
-      String(row[k] || "").toLowerCase().includes(q)
-    );
+    return [
+      "Player", "Team", "Opponent",
+      "away", "home",
+      "ml_best_team",
+    ].some(k => String(row[k] || "").toLowerCase().includes(q));
   });
 }
 
@@ -158,7 +222,7 @@ async function init() {
     fetchJSONAny(["./data/moneyline.json", "./moneyline.json"]),
     fetchJSONAny(["./data/points_lines.json", "./points_lines.json"]),
     fetchJSONAny(["./data/pa_lines.json", "./pa_lines.json"]),
-    fetchJSONAny(["./data/pra_lines.json", "./pra_lines.json"])
+    fetchJSONAny(["./data/pra_lines.json", "./pra_lines.json"]),
   ]);
 
   const mlData = normalizeMoneyline(mlRaw);
@@ -171,10 +235,8 @@ async function init() {
   const paTable = buildLinesTable("#tblPA", paData);
   const praTable = buildLinesTable("#tblPRA", praData);
 
-  // Default view: Moneyline Bets
   activeTable = mlTable;
 
-  // Tab buttons
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const v = btn.dataset.view;
@@ -189,7 +251,6 @@ async function init() {
     });
   });
 
-  // Global search
   const search = document.getElementById("globalSearch");
   const clearBtn = document.getElementById("clearSearchBtn");
 
