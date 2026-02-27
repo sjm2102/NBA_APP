@@ -259,3 +259,38 @@ button:hover {
     justify-content: space-between;
   }
 }
+
+/* ===== Table spacing & navigation fixes ===== */
+
+.table-wrap {
+  padding: 8px 10px 14px;
+}
+
+.tabulator {
+  margin-top: 6px;
+  border-radius: 12px;
+}
+
+.tabulator-tableHolder {
+  max-height: none !important;
+  overflow-y: visible !important;
+}
+
+.panel {
+  margin-bottom: 20px;
+}
+
+.filters {
+  margin-top: 8px;
+  gap: 10px;
+}
+
+@media (max-width: 900px) {
+  .table-wrap {
+    overflow-x: auto;
+  }
+
+  .tabulator {
+    font-size: 13px;
+  }
+}
