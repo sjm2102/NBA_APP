@@ -1,296 +1,196 @@
-/* ===============================
-   GLOBAL THEME (Readable Dark UI)
-   =============================== */
-
-:root {
-  --bg: #0b1020;
-  --panel: #141a2e;
-  --panel-header: #1b2340;
-  --border: #2a335c;
-  --text: #e9ecf5;
-  --muted: #aab0d6;
-  --accent: #4da3ff;
+:root{
+  --bg:#0b1020;
+  --panel:#141a2e;
+  --panel-header:#1b2340;
+  --border:#2a335c;
+  --text:#e9ecf5;
+  --muted:#aab0d6;
+  --accent:#4da3ff;
+  --shadow: 0 16px 50px rgba(0,0,0,.45);
 }
 
-body {
-  margin: 0;
+*{box-sizing:border-box}
+html,body{height:100%}
+
+body{
+  margin:0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   background: radial-gradient(circle at top, #1b2447, #060a18);
-  color: var(--text);
+  color:var(--text);
 }
 
-/* ===============================
-   PANELS
-   =============================== */
+/* Top bar */
+.topbar{
+  position: sticky;
+  top:0;
+  z-index: 10;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  padding: 12px 14px;
+  background: rgba(8, 12, 24, 0.80);
+  backdrop-filter: blur(10px);
+  border-bottom:1px solid var(--border);
+}
 
-.panel {
+.brand .title{font-weight:800; letter-spacing:.2px}
+.brand .subtitle{font-size:12px; color:var(--muted); margin-top:2px}
+
+.top-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.panel-label{
+  min-width: 140px;
+  text-align:center;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.navbtn{
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.08);
+  color: var(--text);
+  cursor:pointer;
+}
+.navbtn:hover{background: rgba(255,255,255,0.12)}
+.navbtn.ghost{background: rgba(255,255,255,0.04)}
+
+/* Stage / 3D wheel */
+.stage{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 18px 12px 28px;
+}
+
+.wheel{
+  position: relative;
+  perspective: 1200px;
+  width: 100%;
+  height: calc(100vh - 120px);
+  min-height: 560px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.track{
+  position: relative;
+  width: min(1100px, 96vw);
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.card{
+  position:absolute;
+  inset: 0;
+  margin: auto;
+  width: 100%;
+  height: 100%;
+  max-height: 720px;
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0,0,0,.45);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  overflow:hidden;
+  transform-style: preserve-3d;
+  transition: transform 420ms ease, opacity 420ms ease;
+  opacity: 0.35;
+  pointer-events: none;
 }
 
-.panel-head {
+.card.active{
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.panel-head{
   background: var(--panel-header);
   padding: 12px 14px;
   border-bottom: 1px solid var(--border);
 }
-
-.panel h2 {
-  margin: 0;
-  font-size: 15px;
-  color: #ffffff;
+.panel-head h2{
+  margin:0 0 10px 0;
+  font-size: 16px;
+  color:#fff;
 }
 
-/* ===============================
-   INPUTS / FILTERS
-   =============================== */
+.filters{
+  display:flex;
+  gap:10px;
+  flex-wrap: wrap;
+  align-items:center;
+}
 
-.input,
-select,
-button {
+.input{
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
   background: #0f1430;
   color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 8px 10px;
+  min-width: 260px;
 }
 
-button {
+.btn{
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.08);
+  color: var(--text);
   cursor: pointer;
 }
+.btn:hover{background: rgba(255,255,255,0.12)}
+.btn.ghost{background: rgba(255,255,255,0.04)}
+.btn.ghost:hover{background: rgba(255,255,255,0.08)}
 
-button:hover {
-  background: #1a2146;
+.table-wrap{
+  padding: 10px 12px 14px;
+  height: calc(100% - 92px);
 }
 
-/* ===============================
-   TABULATOR FIXES (IMPORTANT)
-   =============================== */
-
-.tabulator {
+/* Tabulator readability + stop weird stretching */
+.tabulator{
   background: #0f1430 !important;
   color: var(--text) !important;
-  border: none !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 14px;
+  overflow: hidden;
 }
-
-/* Header */
-.tabulator-header {
+.tabulator-header{
   background: #1a2146 !important;
-  color: #ffffff !important;
-  font-weight: 600;
+  color: #fff !important;
+  font-weight: 700;
 }
-
-.tabulator-col {
+.tabulator-col{
   background: #1a2146 !important;
-  color: #ffffff !important;
-  border-right: 1px solid var(--border) !important;
+  color:#fff !important;
+  border-right:1px solid var(--border) !important;
+}
+.tabulator-row{background:#0f1430 !important; color:var(--text) !important;}
+.tabulator-row:nth-child(even){background:#121a3a !important;}
+.tabulator-row:hover{background:#1f2a5a !important;}
+.tabulator-cell{color:var(--text) !important; border-right:1px solid rgba(255,255,255,0.06) !important;}
+.tabulator-tableHolder{
+  height: 100% !important;
+  overflow: auto !important;
+}
+.tabulator-footer{background:#141a2e !important; color:var(--muted) !important;}
+
+.hint{
+  margin-top: 12px;
+  text-align:center;
+  font-size: 12px;
+  color: var(--muted);
 }
 
-/* Rows */
-.tabulator-row {
-  background: #0f1430 !important;
-  color: var(--text) !important;
-}
-
-.tabulator-row:nth-child(even) {
-  background: #121a3a !important;
-}
-
-/* Hover */
-.tabulator-row:hover {
-  background: #1f2a5a !important;
-}
-
-/* Cells */
-.tabulator-cell {
-  color: var(--text) !important;
-  border-right: 1px solid #1f2a5a !important;
-}
-
-/* Pagination */
-.tabulator-footer {
-  background: #141a2e !important;
-  color: var(--muted) !important;
-}
-  text-align: center;
-}
-
-/* ====== UPGRADES ====== */
-
-/* EV coloring */
-.ev-positive { color: #6CFF8D !important; font-weight: 600; }
-.ev-negative { color: #FF6C6C !important; font-weight: 600; }
-
-/* Top 5 highlight */
-.top-edge {
-  outline: 2px solid #4da3ff;
-  outline-offset: -2px;
-  background: #1c2a5a !important;
-}
-
-/* Toggle */
-.top-controls {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-}
-
-.toggle {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-}
-
-/* Mobile optimization */
-@media (max-width: 900px) {
-  .container {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-  }
-
-  .filters {
-    flex-wrap: wrap;
-  }
-
-  .tabulator {
-    font-size: 12px;
-  }
-}
-
-/* ===============================
-   MOBILE OPTIMIZATION
-   =============================== */
-
-@media (max-width: 900px) {
-
-  /* Layout */
-  .container {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 12px;
-  }
-
-  .panel {
-    border-radius: 14px;
-  }
-
-  .panel-head h2 {
-    font-size: 16px;
-  }
-
-  /* Filters stack cleanly */
-  .filters {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-
-  .filters input,
-  .filters select,
-  .filters button {
-    font-size: 14px;
-    padding: 10px;
-  }
-
-  /* Tables */
-  .tabulator {
-    font-size: 13px !important;
-  }
-
-  .tabulator-header {
-    position: sticky;
-    top: 0;
-    z-index: 5;
-  }
-
-  /* Row spacing */
-  .tabulator-row {
-    min-height: 44px;
-  }
-
-  /* Horizontal scroll ONLY inside tables */
-  .tabulator-tableHolder {
-    overflow-x: auto !important;
-  }
-
-  /* Hide less important columns on mobile */
-  .tabulator-col[data-field="Opponent"],
-  .tabulator-col[data-field="Odds"],
-  .tabulator-col[data-field="Team"] {
-    display: none !important;
-  }
-
-  .tabulator-cell[data-field="Opponent"],
-  .tabulator-cell[data-field="Odds"],
-  .tabulator-cell[data-field="Team"] {
-    display: none !important;
-  }
-
-  /* Emphasize key info */
-  .tabulator-cell[data-field="Player"] {
-    font-weight: 600;
-    font-size: 14px;
-  }
-
-  .tabulator-cell[data-field="best_edge"] {
-    font-weight: 700;
-    color: #6CFF8D;
-  }
-
-  .tabulator-cell[data-field="best_side"] {
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-
-  /* Top bar */
-  .topbar {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .top-controls {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-  }
-}
-
-/* ===== Table spacing & navigation fixes ===== */
-
-.table-wrap {
-  padding: 8px 10px 14px;
-}
-
-.tabulator {
-  margin-top: 6px;
-  border-radius: 12px;
-}
-
-.tabulator-tableHolder {
-  max-height: none !important;
-  overflow-y: visible !important;
-}
-
-.panel {
-  margin-bottom: 20px;
-}
-
-.filters {
-  margin-top: 8px;
-  gap: 10px;
-}
-
-@media (max-width: 900px) {
-  .table-wrap {
-    overflow-x: auto;
-  }
-
-  .tabulator {
-    font-size: 13px;
-  }
+/* Mobile tweaks */
+@media (max-width: 900px){
+  .wheel{height: calc(100vh - 140px); min-height: 520px;}
+  .input{min-width: 220px; width: 100%;}
+  .panel-label{display:none;}
 }
