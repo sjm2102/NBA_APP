@@ -19,8 +19,8 @@ function buildMoneylineTable(el, data) {
     responsiveLayout: "collapse",
     initialSort: [{ column: "home_win_prob", dir: "desc" }],
     columns: [
-      { title: "Away", field: "away", headerSort:true },
-      { title: "Home", field: "home", headerSort:true },
+      { title: "Away", field: "away", headerSort: true },
+      { title: "Home", field: "home", headerSort: true },
       {
         title: "Home Win %",
         field: "home_win_prob",
@@ -44,13 +44,29 @@ function buildLinesTable(el, data) {
     responsiveLayout: "collapse",
     initialSort: [{ column: "best_edge", dir: "desc" }],
     columns: [
-      { title: "Player", field: "Player", minWidth: 140 },
-      { title: "Team", field: "Team" },
-      { title: "Opp", field: "Opponent" },
-      { title: "Line", field: "line", hozAlign:"right" },
-      { title: "Model %", field: "best_prob", formatter:c=>pct(c.getValue()), hozAlign:"right" },
-      { title: "Edge", field: "best_edge", formatter:c=>c.getValue().toFixed(3), hozAlign:"right" },
-      { title: "EV / $1", field: "best_ev_$1", formatter:c=>c.getValue().toFixed(3), hozAlign:"right" }
+      { title: "Player", field: "player", minWidth: 140 },
+      { title: "Team", field: "team" },
+      { title: "Opp", field: "opponent" },
+      { title: "Market", field: "market" },
+      { title: "Line", field: "line", hozAlign: "right" },
+      {
+        title: "Model %",
+        field: "best_prob",
+        formatter: c => pct(c.getValue()),
+        hozAlign: "right"
+      },
+      {
+        title: "Edge",
+        field: "best_edge",
+        formatter: c => c.getValue().toFixed(3),
+        hozAlign: "right"
+      },
+      {
+        title: "EV / $1",
+        field: "best_ev_$1",
+        formatter: c => c.getValue().toFixed(3),
+        hozAlign: "right"
+      }
     ]
   });
 }
@@ -78,6 +94,7 @@ function attachSearch(table, inputId, clearId, fields) {
   }
 
   input.addEventListener("input", apply);
+
   clear.addEventListener("click", () => {
     input.value = "";
     table.clearFilter();
@@ -94,17 +111,23 @@ async function init() {
   const pa = await loadJSON("./data/pa_lines.json");
   const pra = await loadJSON("./data/pra_lines.json");
 
+  // Clear old
+  document.getElementById("tblMoneyline").innerHTML = "";
+  document.getElementById("tblPoints").innerHTML = "";
+  document.getElementById("tblPA").innerHTML = "";
+  document.getElementById("tblPRA").innerHTML = "";
+
   const ml = buildMoneylineTable("#tblMoneyline", moneyline);
   attachSearch(ml, "mlSearch", "mlClear", ["away", "home"]);
 
   const pt = buildLinesTable("#tblPoints", points);
-  attachSearch(pt, "ptSearch", "ptClear", ["Player", "Team", "Opponent"]);
+  attachSearch(pt, "ptSearch", "ptClear", ["player", "team", "opponent"]);
 
   const paT = buildLinesTable("#tblPA", pa);
-  attachSearch(paT, "paSearch", "paClear", ["Player", "Team", "Opponent"]);
+  attachSearch(paT, "paSearch", "paClear", ["player", "team", "opponent"]);
 
   const praT = buildLinesTable("#tblPRA", pra);
-  attachSearch(praT, "praSearch", "praClear", ["Player", "Team", "Opponent"]);
+  attachSearch(praT, "praSearch", "praClear", ["player", "team", "opponent"]);
 }
 
 init();
