@@ -10,87 +10,69 @@
 </head>
 
 <body>
-<header class="topbar">
-  <div class="brand">
-    <div class="title">NBA Bets Dashboard</div>
-    <div class="subtitle">Use arrows to rotate tables • Search is per table</div>
-  </div>
-
-  <div class="top-actions">
-    <button id="prevBtn" class="navbtn" aria-label="Previous table">◀</button>
-    <div id="panelLabel" class="panel-label">Loading…</div>
-    <button id="nextBtn" class="navbtn" aria-label="Next table">▶</button>
-    <button id="reloadBtn" class="navbtn ghost">Reload</button>
-  </div>
-</header>
-
-<main class="stage">
-  <div class="wheel" id="wheel">
-    <div class="track" id="track">
-
-      <!-- PANEL 0: Moneyline -->
-      <section class="card panel" data-title="Moneyline">
-        <div class="panel-head">
-          <h2>Moneyline</h2>
-          <div class="filters">
-            <input id="mlSearch" class="input" placeholder="Search team…" />
-            <button id="mlClear" class="btn ghost">Clear</button>
-          </div>
-        </div>
-        <div class="table-wrap">
-          <div id="tblMoneyline"></div>
-        </div>
-      </section>
-
-      <!-- PANEL 1: Points -->
-      <section class="card panel" data-title="Points Lines">
-        <div class="panel-head">
-          <h2>Points</h2>
-          <div class="filters">
-            <input id="ptSearch" class="input" placeholder="Search player/team/opponent…" />
-            <button id="ptClear" class="btn ghost">Clear</button>
-          </div>
-        </div>
-        <div class="table-wrap">
-          <div id="tblPoints"></div>
-        </div>
-      </section>
-
-      <!-- PANEL 2: PA -->
-      <section class="card panel" data-title="PA Lines">
-        <div class="panel-head">
-          <h2>PA (Points + Assists)</h2>
-          <div class="filters">
-            <input id="paSearch" class="input" placeholder="Search player/team/opponent…" />
-            <button id="paClear" class="btn ghost">Clear</button>
-          </div>
-        </div>
-        <div class="table-wrap">
-          <div id="tblPA"></div>
-        </div>
-      </section>
-
-      <!-- PANEL 3: PRA -->
-      <section class="card panel" data-title="PRA Lines">
-        <div class="panel-head">
-          <h2>PRA (Points + Rebounds + Assists)</h2>
-          <div class="filters">
-            <input id="praSearch" class="input" placeholder="Search player/team/opponent…" />
-            <button id="praClear" class="btn ghost">Clear</button>
-          </div>
-        </div>
-        <div class="table-wrap">
-          <div id="tblPRA"></div>
-        </div>
-      </section>
-
+  <header class="topbar">
+    <div class="brand">
+      <div class="title">NBA Bets Dashboard</div>
+      <div class="subtitle">Tabbed views • Fast search • Clean tables</div>
     </div>
-  </div>
 
-  <div class="hint">Tip: On mobile, swipe left/right to rotate.</div>
-</main>
+    <div class="actions">
+      <button class="btn ghost" id="reloadBtn">Reload</button>
+    </div>
+  </header>
 
-<script src="https://unpkg.com/tabulator-tables@6.2.5/dist/js/tabulator.min.js"></script>
-<script src="./app.js"></script>
+  <main class="page">
+    <!-- Views bar -->
+    <section class="views-bar">
+      <div class="views-left">
+        <div class="views-label">Views</div>
+
+        <button class="tab-btn active" data-view="moneyline">Predictions</button>
+        <button class="tab-btn" data-view="points">RW Projections</button>
+        <button class="tab-btn" data-view="pa">Hit Rates</button>
+        <button class="tab-btn" data-view="pra">Lines</button>
+      </div>
+
+      <div class="views-right">
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input id="globalSearch" class="input" placeholder="Search player/team/opponent…" />
+        </div>
+        <button class="btn ghost" id="clearSearchBtn">Clear</button>
+      </div>
+    </section>
+
+    <!-- Content -->
+    <section class="panel panel-big">
+      <div class="panel-head">
+        <div class="panel-title">
+          <h2 id="viewTitle">Predictions</h2>
+          <div id="viewHint" class="hint">Moneyline model win probabilities</div>
+        </div>
+      </div>
+
+      <!-- Each view is a container; we show/hide -->
+      <div class="view-stack">
+        <div class="view active" id="view-moneyline">
+          <div class="table-wrap"><div id="tblMoneyline"></div></div>
+        </div>
+
+        <div class="view" id="view-points">
+          <div class="table-wrap"><div id="tblPoints"></div></div>
+        </div>
+
+        <div class="view" id="view-pa">
+          <div class="table-wrap"><div id="tblPA"></div></div>
+        </div>
+
+        <div class="view" id="view-pra">
+          <div class="table-wrap"><div id="tblPRA"></div></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/tabulator-tables@6.2.5/dist/js/tabulator.min.js"></script>
+  <script src="./app.js"></script>
 </body>
 </html>
