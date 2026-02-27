@@ -205,3 +205,30 @@ body{
   .input{min-width: 0; width:100%;}
   .table-wrap{height: calc(100vh - 320px); min-height: 480px;}
 }
+
+/* ===== Full-width layout ===== */
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.container, .wrap, main, .main, .content {
+  max-width: none !important;
+  width: 100% !important;
+}
+
+.page, .app, #app {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.view {
+  width: 100% !important;
+}
+
+/* If you have a centered card-like wrapper, flatten it */
+.card, .panel {
+  width: 100% !important;
+  max-width: none !important;
+}
