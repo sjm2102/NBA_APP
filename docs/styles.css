@@ -194,3 +194,18 @@ body{
   .input{min-width: 220px; width: 100%;}
   .panel-label{display:none;}
 }
+
+/* Fix table width/gaps */
+.tabulator {
+  width: 100% !important;
+}
+
+.table-wrap {
+  width: 100%;
+}
+
+/* Make the active card truly centered with no extra side space */
+.track {
+  width: 100% !important;
+  max-width: 1100px;
+}
