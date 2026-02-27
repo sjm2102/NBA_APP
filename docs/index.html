@@ -27,10 +27,10 @@
       <div class="views-left">
         <div class="views-label">Views</div>
 
-        <button class="tab-btn active" data-view="moneyline">Predictions</button>
-        <button class="tab-btn" data-view="points">RW Projections</button>
-        <button class="tab-btn" data-view="pa">Hit Rates</button>
-        <button class="tab-btn" data-view="pra">Lines</button>
+        <button class="tab-btn active" data-view="moneyline">Moneyline Bets</button>
+        <button class="tab-btn" data-view="points">Points Lines</button>
+        <button class="tab-btn" data-view="pa">Points + Assists</button>
+        <button class="tab-btn" data-view="pra">Points + Rebounds + Assists</button>
       </div>
 
       <div class="views-right">
@@ -46,12 +46,11 @@
     <section class="panel panel-big">
       <div class="panel-head">
         <div class="panel-title">
-          <h2 id="viewTitle">Predictions</h2>
+          <h2 id="viewTitle">Moneyline Bets</h2>
           <div id="viewHint" class="hint">Moneyline model win probabilities</div>
         </div>
       </div>
 
-      <!-- Each view is a container; we show/hide -->
       <div class="view-stack">
         <div class="view active" id="view-moneyline">
           <div class="table-wrap"><div id="tblMoneyline"></div></div>
