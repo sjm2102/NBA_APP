@@ -32,7 +32,6 @@ function num(x, d = 3) {
 function oddsFmt(x) {
   if (x === null || x === undefined || x === "") return "";
   const n = Number(x);
-  // Keep odds as-is if numeric; otherwise show string
   return Number.isFinite(n) ? String(Math.trunc(n)) : String(x);
 }
 
@@ -43,52 +42,115 @@ function flameFormatter(cell) {
 }
 
 /* =========================
-   NORMALIZE DATA
+   NORMALIZE DATA (match your cleaned Excel columns)
    ========================= */
 
 function normalizeMoneyline(rows) {
   return (rows || []).map(r => {
-    const away = r.away ?? r.Away ?? "";
-    const home = r.home ?? r.Home ?? "";
+    const away = r.away ?? "";
+    const home = r.home ?? "";
 
-    const homeP = Number(r.home_win_prob ?? r.homeProb ?? r.HomeProb ?? r.home_prob ?? 0) || 0;
-    const awayP = Number(r.away_win_prob ?? r.awayProb ?? r.AwayProb ?? r.away_prob ?? 0) || 0;
-
-    // Try multiple possible field names for best team
-    const bestTeam =
-      r.ml_best_team ??
-      r.ml_best ??
-      r.best_team ??
-      r.best ??
-      r["Best"] ??
-      (homeP >= awayP ? home : away);
+    const awayModel = Number(r.away_model_win_prob ?? 0) || 0;
+    const homeModel = Number(r.home_model_win_prob ?? 0) || 0;
 
     return {
+      date: r.date ?? "",
       away,
       home,
-      home_win_prob: r.home_win_prob ?? r.homeProb ?? r.HomeProb ?? r.home_prob ?? "",
-      away_win_prob: r.away_win_prob ?? r.awayProb ?? r.AwayProb ?? r.away_prob ?? "",
-      ml_best_team: bestTeam,
-      // flame logic on moneyline: max(home, away)
-      ml_best_prob: Math.max(homeP, awayP),
+
+      away_ml: r.away_ml ?? "",
+      home_ml: r.home_ml ?? "",
+
+      away_market_win_prob: r.away_market_win_prob ?? "",
+      home_market_win_prob: r.home_market_win_prob ?? "",
+
+      away_model_win_prob: r.away_model_win_prob ?? "",
+      home_model_win_prob: r.home_model_win_prob ?? "",
+
+      away_ml_edge: r.away_ml_edge ?? "",
+      home_ml_edge: r.home_ml_edge ?? "",
+
+      sd_margin: r.sd_margin ?? "",
+      away_proj_pts: r.away_proj_pts ?? "",
+      home_proj_pts: r.home_proj_pts ?? "",
+
+      "Model pick": r["Model pick"] ?? r.Model_pick ?? r.model_pick ?? "",
+
+      // flame driver: max model win prob
+      ml_best_prob: Math.max(awayModel, homeModel),
     };
   });
 }
 
-function normalizeLines(rows) {
+function normalizeSpreads(rows) {
+  return (rows || []).map(r => {
+    const awayCover = Number(r.away_model_cover_prob ?? 0) || 0;
+    const homeCover = Number(r.home_model_cover_prob ?? 0) || 0;
+
+    return {
+      date: r.date ?? "",
+      away: r.away ?? "",
+      home: r.home ?? "",
+      away_spread: r.away_spread ?? "",
+      home_spread: r.home_spread ?? "",
+
+      market_cover_prob_assumed: r.market_cover_prob_assumed ?? "",
+      away_model_cover_prob: r.away_model_cover_prob ?? "",
+      home_model_cover_prob: r.home_model_cover_prob ?? "",
+
+      away_spread_edge: r.away_spread_edge ?? "",
+      home_spread_edge: r.home_spread_edge ?? "",
+
+      away_proj_pts: r.away_proj_pts ?? "",
+      home_proj_pts: r.home_proj_pts ?? "",
+      total: r.total ?? "",
+
+      "Model pick": r["Model pick"] ?? r.Model_pick ?? r.model_pick ?? "",
+
+      pick_conservative: r.pick_conservative ?? "",
+      pick_moderate: r.pick_moderate ?? "",
+      pick_risky: r.pick_risky ?? "",
+
+      // flame driver: max cover prob
+      spread_best_prob: Math.max(awayCover, homeCover),
+    };
+  });
+}
+
+function normalizeProps(rows) {
   return (rows || []).map(r => ({
-    Player: r.Player ?? r.player ?? "",
-    Team: r.Team ?? r.team ?? "",
-    Opponent: r.Opponent ?? r.opponent ?? "",
-    line: r.line ?? r.Line ?? "",
-    best_prob: r.best_prob ?? r.model_prob ?? r.bestProb ?? r["Model Prob"] ?? "",
-    best_edge: r.best_edge ?? r.edge ?? r.bestEdge ?? "",
-    best_ev_$1: r["best_ev_$1"] ?? r.ev_$1 ?? r.bestEV ?? "",
-    // NEW requested fields (assumed present in JSON)
-    odds_under: r.odds_under ?? r.under_odds ?? r.oddsU ?? r["Odds Under"] ?? "",
-    odds_over: r.odds_over ?? r.over_odds ?? r.oddsO ?? r["Odds Over"] ?? "",
-    season_mean: r.season_mean ?? r.mean ?? r.avg ?? r["Season Mean"] ?? "",
+    Player: r.Player ?? "",
+    Position: r.Position ?? "",
+    Team: r.Team ?? "",
+    Opponent: r.Opponent ?? "",
+    dvp_rank_pos: r.dvp_rank_pos ?? "",
+
+    season_mean: r.season_mean ?? "",
+
+    dk_line: r.dk_line ?? "",
+    dk_odds_under: r.dk_odds_under ?? "",
+    dk_odds_over: r.dk_odds_over ?? "",
+
+    fd_line: r.fd_line ?? "",
+    fd_odds_under: r.fd_odds_under ?? "",
+    fd_odds_over: r.fd_odds_over ?? "",
+
+    pick_conservative: r.pick_conservative ?? "",
+    pick_moderate: r.pick_moderate ?? "",
+    pick_risky: r.pick_risky ?? "",
+
+    // flame driver: if your picks include p=0.xxx, you could parse it.
+    // For now: no flame based on pick text; leaving blank is fine.
+    // We'll compute a simple proxy: if pick_conservative contains "p=0." parse it.
+    best_prob_proxy: extractProbFromPick(r.pick_conservative),
   }));
+}
+
+function extractProbFromPick(txt) {
+  if (!txt) return "";
+  // supports "... p=0.823 ..." or "... p=0.82 ..."
+  const m = String(txt).match(/p\s*=\s*(0\.\d+)/i);
+  return m ? Number(m[1]) : "";
 }
 
 /* =========================
@@ -112,60 +174,112 @@ function buildMoneylineTable(el, data) {
         width: 50,
         headerSort: false,
       },
+      { title: "Date", field: "date", widthGrow: 1 },
       { title: "Away", field: "away", widthGrow: 1 },
       { title: "Home", field: "home", widthGrow: 1 },
 
-      // ✅ NEW
-      { title: "Best", field: "ml_best_team", widthGrow: 1 },
+      { title: "Away ML", field: "away_ml", formatter: c => oddsFmt(c.getValue()), hozAlign: "right", widthGrow: 1 },
+      { title: "Home ML", field: "home_ml", formatter: c => oddsFmt(c.getValue()), hozAlign: "right", widthGrow: 1 },
 
-      {
-        title: "Home Win %",
-        field: "home_win_prob",
-        formatter: c => pct(c.getValue()),
-        hozAlign: "right",
-        widthGrow: 1,
-      },
-      {
-        title: "Away Win %",
-        field: "away_win_prob",
-        formatter: c => pct(c.getValue()),
-        hozAlign: "right",
-        widthGrow: 1,
-      },
+      { title: "Away Mkt %", field: "away_market_win_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1 },
+      { title: "Home Mkt %", field: "home_market_win_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1 },
+
+      { title: "Away Model %", field: "away_model_win_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1 },
+      { title: "Home Model %", field: "home_model_win_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1 },
+
+      { title: "Away Edge", field: "away_ml_edge", formatter: c => num(c.getValue(), 3), hozAlign: "right", widthGrow: 1 },
+      { title: "Home Edge", field: "home_ml_edge", formatter: c => num(c.getValue(), 3), hozAlign: "right", widthGrow: 1 },
+
+      { title: "SD", field: "sd_margin", formatter: c => num(c.getValue(), 2), hozAlign: "right", widthGrow: 1 },
+      { title: "Away Pts", field: "away_proj_pts", formatter: c => num(c.getValue(), 1), hozAlign: "right", widthGrow: 1 },
+      { title: "Home Pts", field: "home_proj_pts", formatter: c => num(c.getValue(), 1), hozAlign: "right", widthGrow: 1 },
+
+      { title: "Model Pick", field: "Model pick", widthGrow: 1 },
     ],
   });
 }
 
-function buildLinesTable(el, data) {
+function buildSpreadsTable(el, data) {
   return new Tabulator(el, {
     data,
     layout: "fitColumns",
     responsiveLayout: false,
     height: "100%",
-    initialSort: [{ column: "best_edge", dir: "desc" }],
+    initialSort: [{ column: "spread_best_prob", dir: "desc" }],
     columns: [
       {
         title: "",
-        field: "best_prob",
+        field: "spread_best_prob",
         formatter: flameFormatter,
         headerFormatter: () => "",
         hozAlign: "center",
         width: 50,
         headerSort: false,
       },
-      { title: "Player", field: "Player", widthGrow: 1 },
+      { title: "Date", field: "date", widthGrow: 1 },
+      { title: "Away", field: "away", widthGrow: 1 },
+      { title: "Home", field: "home", widthGrow: 1 },
+
+      { title: "Away Spr", field: "away_spread", hozAlign: "right", widthGrow: 1 },
+      { title: "Home Spr", field: "home_spread", hozAlign: "right", widthGrow: 1 },
+
+      { title: "Mkt Cover %", field: "market_cover_prob_assumed", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1 },
+      { title: "Away Model %", field: "away_model_cover_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1 },
+      { title: "Home Model %", field: "home_model_cover_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1 },
+
+      { title: "Away Edge", field: "away_spread_edge", formatter: c => num(c.getValue(), 3), hozAlign: "right", widthGrow: 1 },
+      { title: "Home Edge", field: "home_spread_edge", formatter: c => num(c.getValue(), 3), hozAlign: "right", widthGrow: 1 },
+
+      { title: "Away Pts", field: "away_proj_pts", formatter: c => num(c.getValue(), 1), hozAlign: "right", widthGrow: 1 },
+      { title: "Home Pts", field: "home_proj_pts", formatter: c => num(c.getValue(), 1), hozAlign: "right", widthGrow: 1 },
+      { title: "Total", field: "total", formatter: c => num(c.getValue(), 1), hozAlign: "right", widthGrow: 1 },
+
+      { title: "Model Pick", field: "Model pick", widthGrow: 1 },
+
+      { title: "Conservative", field: "pick_conservative", widthGrow: 2 },
+      { title: "Moderate", field: "pick_moderate", widthGrow: 2 },
+      { title: "Risky", field: "pick_risky", widthGrow: 2 },
+    ],
+  });
+}
+
+function buildPropsTable(el, data) {
+  return new Tabulator(el, {
+    data,
+    layout: "fitColumns",
+    responsiveLayout: false,
+    height: "100%",
+    // sort by proxy prob from conservative pick if present
+    initialSort: [{ column: "best_prob_proxy", dir: "desc" }],
+    columns: [
+      {
+        title: "",
+        field: "best_prob_proxy",
+        formatter: flameFormatter,
+        headerFormatter: () => "",
+        hozAlign: "center",
+        width: 50,
+        headerSort: false,
+      },
+      { title: "Player", field: "Player", widthGrow: 1.5 },
+      { title: "Pos", field: "Position", widthGrow: 0.8 },
       { title: "Team", field: "Team", widthGrow: 1 },
       { title: "Opp", field: "Opponent", widthGrow: 1 },
-      { title: "Line", field: "line", hozAlign: "right", widthGrow: 1 },
+      { title: "DvP Rank", field: "dvp_rank_pos", hozAlign: "right", widthGrow: 1 },
 
-      // ✅ NEW
       { title: "Season Mean", field: "season_mean", formatter: c => num(c.getValue(), 2), hozAlign: "right", widthGrow: 1 },
-      { title: "Odds O", field: "odds_over", formatter: c => oddsFmt(c.getValue()), hozAlign: "right", widthGrow: 1 },
-      { title: "Odds U", field: "odds_under", formatter: c => oddsFmt(c.getValue()), hozAlign: "right", widthGrow: 1 },
 
-      { title: "Model %", field: "best_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1 },
-      { title: "Edge", field: "best_edge", formatter: c => num(c.getValue(), 3), hozAlign: "right", widthGrow: 1 },
-      { title: "EV / $1", field: "best_ev_$1", formatter: c => num(c.getValue(), 3), hozAlign: "right", widthGrow: 1 },
+      { title: "DK Line", field: "dk_line", hozAlign: "right", widthGrow: 1 },
+      { title: "DK O", field: "dk_odds_over", formatter: c => oddsFmt(c.getValue()), hozAlign: "right", widthGrow: 1 },
+      { title: "DK U", field: "dk_odds_under", formatter: c => oddsFmt(c.getValue()), hozAlign: "right", widthGrow: 1 },
+
+      { title: "FD Line", field: "fd_line", hozAlign: "right", widthGrow: 1 },
+      { title: "FD O", field: "fd_odds_over", formatter: c => oddsFmt(c.getValue()), hozAlign: "right", widthGrow: 1 },
+      { title: "FD U", field: "fd_odds_under", formatter: c => oddsFmt(c.getValue()), hozAlign: "right", widthGrow: 1 },
+
+      { title: "Conservative", field: "pick_conservative", widthGrow: 2 },
+      { title: "Moderate", field: "pick_moderate", widthGrow: 2 },
+      { title: "Risky", field: "pick_risky", widthGrow: 2 },
     ],
   });
 }
@@ -186,11 +300,14 @@ function applyGlobalSearch(query) {
   }
 
   activeTable.setFilter(row => {
-    return [
-      "Player", "Team", "Opponent",
+    // Search across common fields from all tables
+    const keys = [
+      "Player", "Team", "Opponent", "Position",
       "away", "home",
-      "ml_best_team",
-    ].some(k => String(row[k] || "").toLowerCase().includes(q));
+      "Model pick",
+      "pick_conservative", "pick_moderate", "pick_risky",
+    ];
+    return keys.some(k => String(row[k] || "").toLowerCase().includes(q));
   });
 }
 
@@ -200,13 +317,15 @@ function applyGlobalSearch(query) {
 
 function switchView(viewId, title, hint, table) {
   document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-  document.getElementById(`view-${viewId}`).classList.add("active");
+  const viewEl = document.getElementById(`view-${viewId}`);
+  if (viewEl) viewEl.classList.add("active");
 
   document.getElementById("viewTitle").textContent = title;
   document.getElementById("viewHint").textContent = hint;
 
   document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-  document.querySelector(`.tab-btn[data-view="${viewId}"]`).classList.add("active");
+  const btn = document.querySelector(`.tab-btn[data-view="${viewId}"]`);
+  if (btn) btn.classList.add("active");
 
   activeTable = table;
   setTimeout(() => table.redraw(true), 50);
@@ -218,36 +337,46 @@ function switchView(viewId, title, hint, table) {
    ========================= */
 
 async function init() {
-  const [mlRaw, ptRaw, paRaw, praRaw] = await Promise.all([
+  const [mlRaw, spRaw, ptRaw, paRaw, praRaw] = await Promise.all([
     fetchJSONAny(["./data/moneyline.json", "./moneyline.json"]),
+    fetchJSONAny(["./data/spreads.json", "./spreads.json"]),
     fetchJSONAny(["./data/points_lines.json", "./points_lines.json"]),
     fetchJSONAny(["./data/pa_lines.json", "./pa_lines.json"]),
     fetchJSONAny(["./data/pra_lines.json", "./pra_lines.json"]),
   ]);
 
   const mlData = normalizeMoneyline(mlRaw);
-  const ptData = normalizeLines(ptRaw);
-  const paData = normalizeLines(paRaw);
-  const praData = normalizeLines(praRaw);
+  const spData = normalizeSpreads(spRaw);
+  const ptData = normalizeProps(ptRaw);
+  const paData = normalizeProps(paRaw);
+  const praData = normalizeProps(praRaw);
 
   const mlTable = buildMoneylineTable("#tblMoneyline", mlData);
-  const ptTable = buildLinesTable("#tblPoints", ptData);
-  const paTable = buildLinesTable("#tblPA", paData);
-  const praTable = buildLinesTable("#tblPRA", praData);
+  const spTable = buildSpreadsTable("#tblSpreads", spData);
+  const ptTable = buildPropsTable("#tblPoints", ptData);
+  const paTable = buildPropsTable("#tblPA", paData);
+  const praTable = buildPropsTable("#tblPRA", praData);
 
   activeTable = mlTable;
 
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const v = btn.dataset.view;
+
       if (v === "moneyline")
         switchView("moneyline", "Moneyline Bets", "Moneyline model win probabilities", mlTable);
+
+      if (v === "spreads")
+        switchView("spreads", "Spreads", "Spread cover probabilities + tier picks", spTable);
+
       if (v === "points")
-        switchView("points", "Points Lines", "Points lines edges & EV", ptTable);
+        switchView("points", "Points Lines", "Points tier picks", ptTable);
+
       if (v === "pa")
-        switchView("pa", "Points + Assists", "PA edges & EV", paTable);
+        switchView("pa", "Points + Assists", "PA tier picks", paTable);
+
       if (v === "pra")
-        switchView("pra", "Points + Rebounds + Assists", "PRA edges & EV", praTable);
+        switchView("pra", "Points + Rebounds + Assists", "PRA tier picks", praTable);
     });
   });
 
