@@ -232,3 +232,30 @@ html, body {
   width: 100% !important;
   max-width: none !important;
 }
+
+/* ===== Tabulator readability ===== */
+.tabulator {
+  font-size: 12px;              /* overall table font */
+}
+
+.tabulator .tabulator-header {
+  font-size: 11px;              /* header slightly smaller */
+}
+
+.tabulator .tabulator-col-title {
+  white-space: normal !important;  /* wrap header text */
+  line-height: 1.1;
+}
+
+.tabulator .tabulator-header .tabulator-col {
+  height: auto !important;         /* allow header to expand */
+}
+
+.tabulator .tabulator-cell {
+  white-space: nowrap;             /* keep rows compact */
+  padding: 6px 6px;
+}
+
+.tabulator .tabulator-row {
+  min-height: 28px;
+}
