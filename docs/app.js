@@ -57,15 +57,15 @@ function attachSearch(table, inputId, clearId, fields){
 function buildMoneylineTable(el, data){
   return new Tabulator(el, {
     data,
-    layout: "fitColumns",
-    responsiveLayout: "collapse",
+    layout: "fitColumns",          // fill available width
+    responsiveLayout: false,       // ✅ removes the injected “collapse” column
     height: "100%",
     initialSort: [{column:"home_win_prob", dir:"desc"}],
     columns: [
-      {title:"Away", field:"away", widthGrow: 2, minWidth: 90},
-      {title:"Home", field:"home", widthGrow: 2, minWidth: 90},
-      {title:"Home Win %", field:"home_win_prob", formatter:c=>pct(c.getValue()), hozAlign:"right", width: 110},
-      {title:"Away Win %", field:"away_win_prob", formatter:c=>pct(c.getValue()), hozAlign:"right", width: 110},
+      {title:"Away", field:"away", minWidth: 110, widthGrow: 2},
+      {title:"Home", field:"home", minWidth: 110, widthGrow: 2},
+      {title:"Home Win %", field:"home_win_prob", formatter:c=>pct(c.getValue()), hozAlign:"right", width: 120},
+      {title:"Away Win %", field:"away_win_prob", formatter:c=>pct(c.getValue()), hozAlign:"right", width: 120},
     ]
   });
 }
@@ -73,18 +73,20 @@ function buildMoneylineTable(el, data){
 function buildLinesTable(el, data){
   return new Tabulator(el, {
     data,
-    layout: "fitColumns",
-    responsiveLayout: "collapse",
+    layout: "fitColumns",          // ✅ fill width (prevents right-side dead space)
+    responsiveLayout: false,       // ✅ removes the injected “collapse” column
     height: "100%",
     initialSort: [{column:"best_edge", dir:"desc"}],
     columns: [
-      {title:"Player", field:"Player", minWidth: 160, widthGrow: 3},
+      {title:"Player", field:"Player", minWidth: 180, widthGrow: 4},
       {title:"Team", field:"Team", width: 80},
       {title:"Opp", field:"Opponent", width: 80},
       {title:"Line", field:"line", hozAlign:"right", width: 80},
       {title:"Model %", field:"best_prob", formatter:c=>pct(c.getValue()), hozAlign:"right", width: 95},
-      {title:"Edge", field:"best_edge", formatter:c=>num(c.getValue(),3), hozAlign:"right", width: 85},
-      {title:"EV/$1", field:"best_ev_$1", formatter:c=>num(c.getValue(),3), hozAlign:"right", width: 85},
+      {title:"Edge", field:"best_edge", formatter:c=>num(c.getValue(),3), hozAlign:"right", width: 90},
+
+      // ✅ last column grows to absorb extra width (stops weird stretching/gaps)
+      {title:"EV/$1", field:"best_ev_$1", formatter:c=>num(c.getValue(),3), hozAlign:"right", minWidth: 90, widthGrow: 2},
     ]
   });
 }
