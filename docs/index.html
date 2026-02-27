@@ -15,14 +15,7 @@
     <h1>NBA Bets Dashboard</h1>
     <div class="subtitle">Moneyline + Player Props (Points / PA / PRA)</div>
   </div>
-
-  <div class="top-controls">
-    <label class="toggle">
-      <input type="checkbox" id="topOnlyToggle" />
-      <span>Top 10 Only</span>
-    </label>
-    <button onclick="location.reload()">Reload</button>
-  </div>
+  <button onclick="location.reload()">Reload</button>
 </header>
 
 <main class="container">
@@ -33,59 +26,54 @@
       <h2>Moneyline</h2>
       <div class="filters">
         <input id="mlSearch" class="input" placeholder="Search team…" />
-        <input id="mlMinProb" class="input" type="number" step="0.01" value="0.60" />
         <button id="mlClear">Clear</button>
       </div>
     </div>
-    <div id="tblMoneyline"></div>
+    <div class="table-wrap">
+      <div id="tblMoneyline"></div>
+    </div>
   </section>
 
   <!-- POINTS -->
   <section class="panel">
-    <div class="panel-head"><h2>Points</h2></div>
-    <div class="filters">
-      <input id="ptSearch" class="input" placeholder="Search player/team…" />
-      <select id="ptSide" class="input">
-        <option value="">Side (Any)</option>
-        <option value="OVER">OVER</option>
-        <option value="UNDER">UNDER</option>
-      </select>
-      <input id="ptMinEdge" class="input" type="number" step="0.01" value="0.03" />
-      <button id="ptClear">Clear</button>
+    <div class="panel-head">
+      <h2>Points</h2>
+      <div class="filters">
+        <input id="ptSearch" class="input" placeholder="Search player or team…" />
+        <button id="ptClear">Clear</button>
+      </div>
     </div>
-    <div id="tblPoints"></div>
+    <div class="table-wrap">
+      <div id="tblPoints"></div>
+    </div>
   </section>
 
   <!-- PA -->
   <section class="panel">
-    <div class="panel-head"><h2>PA (Points + Assists)</h2></div>
-    <div class="filters">
-      <input id="paSearch" class="input" placeholder="Search player/team…" />
-      <select id="paSide" class="input">
-        <option value="">Side (Any)</option>
-        <option value="OVER">OVER</option>
-        <option value="UNDER">UNDER</option>
-      </select>
-      <input id="paMinEdge" class="input" type="number" step="0.01" value="0.03" />
-      <button id="paClear">Clear</button>
+    <div class="panel-head">
+      <h2>PA (Points + Assists)</h2>
+      <div class="filters">
+        <input id="paSearch" class="input" placeholder="Search player or team…" />
+        <button id="paClear">Clear</button>
+      </div>
     </div>
-    <div id="tblPA"></div>
+    <div class="table-wrap">
+      <div id="tblPA"></div>
+    </div>
   </section>
 
   <!-- PRA -->
   <section class="panel">
-    <div class="panel-head"><h2>PRA (Points + Rebounds + Assists)</h2></div>
-    <div class="filters">
-      <input id="praSearch" class="input" placeholder="Search player/team…" />
-      <select id="praSide" class="input">
-        <option value="">Side (Any)</option>
-        <option value="OVER">OVER</option>
-        <option value="UNDER">UNDER</option>
-      </select>
-      <input id="praMinEdge" class="input" type="number" step="0.01" value="0.03" />
-      <button id="praClear">Clear</button>
+    <div class="panel-head">
+      <h2>PRA (Points + Rebounds + Assists)</h2>
+      <div class="filters">
+        <input id="praSearch" class="input" placeholder="Search player or team…" />
+        <button id="praClear">Clear</button>
+      </div>
     </div>
-    <div id="tblPRA"></div>
+    <div class="table-wrap">
+      <div id="tblPRA"></div>
+    </div>
   </section>
 
 </main>
