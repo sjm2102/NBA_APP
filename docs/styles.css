@@ -259,3 +259,9 @@ html, body {
 .tabulator .tabulator-row {
   min-height: 28px;
 }
+
+/* ===== Horizontal scroll container ===== */
+.view > div[id^="tbl"] {
+  width: 100%;
+  overflow-x: auto;
+}
