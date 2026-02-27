@@ -11,71 +11,83 @@
 
 <body>
 <header class="topbar">
-  <div>
-    <h1>NBA Bets Dashboard</h1>
-    <div class="subtitle">Moneyline + Player Props (Points / PA / PRA)</div>
+  <div class="brand">
+    <div class="title">NBA Bets Dashboard</div>
+    <div class="subtitle">Use arrows to rotate tables • Search is per table</div>
   </div>
-  <button onclick="location.reload()">Reload</button>
+
+  <div class="top-actions">
+    <button id="prevBtn" class="navbtn" aria-label="Previous table">◀</button>
+    <div id="panelLabel" class="panel-label">Loading…</div>
+    <button id="nextBtn" class="navbtn" aria-label="Next table">▶</button>
+    <button id="reloadBtn" class="navbtn ghost">Reload</button>
+  </div>
 </header>
 
-<main class="container">
+<main class="stage">
+  <div class="wheel" id="wheel">
+    <div class="track" id="track">
 
-  <!-- MONEYLINE -->
-  <section class="panel">
-    <div class="panel-head">
-      <h2>Moneyline</h2>
-      <div class="filters">
-        <input id="mlSearch" class="input" placeholder="Search team…" />
-        <button id="mlClear">Clear</button>
-      </div>
-    </div>
-    <div class="table-wrap">
-      <div id="tblMoneyline"></div>
-    </div>
-  </section>
+      <!-- PANEL 0: Moneyline -->
+      <section class="card panel" data-title="Moneyline">
+        <div class="panel-head">
+          <h2>Moneyline</h2>
+          <div class="filters">
+            <input id="mlSearch" class="input" placeholder="Search team…" />
+            <button id="mlClear" class="btn ghost">Clear</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <div id="tblMoneyline"></div>
+        </div>
+      </section>
 
-  <!-- POINTS -->
-  <section class="panel">
-    <div class="panel-head">
-      <h2>Points</h2>
-      <div class="filters">
-        <input id="ptSearch" class="input" placeholder="Search player or team…" />
-        <button id="ptClear">Clear</button>
-      </div>
-    </div>
-    <div class="table-wrap">
-      <div id="tblPoints"></div>
-    </div>
-  </section>
+      <!-- PANEL 1: Points -->
+      <section class="card panel" data-title="Points Lines">
+        <div class="panel-head">
+          <h2>Points</h2>
+          <div class="filters">
+            <input id="ptSearch" class="input" placeholder="Search player/team/opponent…" />
+            <button id="ptClear" class="btn ghost">Clear</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <div id="tblPoints"></div>
+        </div>
+      </section>
 
-  <!-- PA -->
-  <section class="panel">
-    <div class="panel-head">
-      <h2>PA (Points + Assists)</h2>
-      <div class="filters">
-        <input id="paSearch" class="input" placeholder="Search player or team…" />
-        <button id="paClear">Clear</button>
-      </div>
-    </div>
-    <div class="table-wrap">
-      <div id="tblPA"></div>
-    </div>
-  </section>
+      <!-- PANEL 2: PA -->
+      <section class="card panel" data-title="PA Lines">
+        <div class="panel-head">
+          <h2>PA (Points + Assists)</h2>
+          <div class="filters">
+            <input id="paSearch" class="input" placeholder="Search player/team/opponent…" />
+            <button id="paClear" class="btn ghost">Clear</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <div id="tblPA"></div>
+        </div>
+      </section>
 
-  <!-- PRA -->
-  <section class="panel">
-    <div class="panel-head">
-      <h2>PRA (Points + Rebounds + Assists)</h2>
-      <div class="filters">
-        <input id="praSearch" class="input" placeholder="Search player or team…" />
-        <button id="praClear">Clear</button>
-      </div>
-    </div>
-    <div class="table-wrap">
-      <div id="tblPRA"></div>
-    </div>
-  </section>
+      <!-- PANEL 3: PRA -->
+      <section class="card panel" data-title="PRA Lines">
+        <div class="panel-head">
+          <h2>PRA (Points + Rebounds + Assists)</h2>
+          <div class="filters">
+            <input id="praSearch" class="input" placeholder="Search player/team/opponent…" />
+            <button id="praClear" class="btn ghost">Clear</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <div id="tblPRA"></div>
+        </div>
+      </section>
 
+    </div>
+  </div>
+
+  <div class="hint">Tip: On mobile, swipe left/right to rotate.</div>
 </main>
 
 <script src="https://unpkg.com/tabulator-tables@6.2.5/dist/js/tabulator.min.js"></script>
