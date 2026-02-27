@@ -37,103 +37,88 @@ body{
 .brand .title{font-weight:800; letter-spacing:.2px}
 .brand .subtitle{font-size:12px; color:var(--muted); margin-top:2px}
 
-.top-actions{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.panel-label{
-  min-width: 140px;
-  text-align:center;
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.navbtn{
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: rgba(255,255,255,0.08);
-  color: var(--text);
-  cursor:pointer;
-}
-.navbtn:hover{background: rgba(255,255,255,0.12)}
-.navbtn.ghost{background: rgba(255,255,255,0.04)}
-
-/* Stage / 3D wheel */
-.stage{
-  max-width: 1200px;
+.page{
+  max-width: 1300px;
   margin: 0 auto;
-  padding: 18px 12px 28px;
+  padding: 16px 12px 28px;
 }
 
-.wheel{
-  position: relative;
-  perspective: 1200px;
-  width: 100%;
-  height: calc(100vh - 120px);
-  min-height: 560px;
+/* Views bar (like screenshot) */
+.views-bar{
   display:flex;
+  justify-content:space-between;
   align-items:center;
-  justify-content:center;
-}
-
-.track{
-  position: relative;
-  width: min(1100px, 96vw);
-  height: 100%;
-  transform-style: preserve-3d;
-}
-
-.card{
-  position:absolute;
-  inset: 0;
-  margin: auto;
-  width: 100%;
-  height: 100%;
-  max-height: 720px;
-  background: var(--panel);
+  gap:12px;
+  padding: 10px 10px;
   border: 1px solid var(--border);
-  border-radius: 18px;
-  box-shadow: var(--shadow);
-  overflow:hidden;
-  transform-style: preserve-3d;
-  transition: transform 420ms ease, opacity 420ms ease;
-  opacity: 0.35;
-  pointer-events: none;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  box-shadow: 0 8px 24px rgba(0,0,0,.25);
+  margin-bottom: 12px;
 }
 
-.card.active{
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.panel-head{
-  background: var(--panel-header);
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border);
-}
-.panel-head h2{
-  margin:0 0 10px 0;
-  font-size: 16px;
-  color:#fff;
-}
-
-.filters{
+.views-left{
   display:flex;
-  gap:10px;
-  flex-wrap: wrap;
   align-items:center;
+  gap:8px;
+  flex-wrap: wrap;
+}
+
+.views-label{
+  font-size: 12px;
+  color: var(--muted);
+  margin-right: 6px;
+}
+
+/* Tab buttons */
+.tab-btn{
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(77,163,255,0.55);
+  background: rgba(77,163,255,0.10);
+  color: #dbe9ff;
+  cursor:pointer;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.tab-btn:hover{
+  background: rgba(77,163,255,0.16);
+}
+
+.tab-btn.active{
+  background: rgba(77,163,255,0.26);
+  border-color: rgba(77,163,255,0.9);
+  box-shadow: 0 0 0 2px rgba(77,163,255,0.15) inset;
+}
+
+/* Search area */
+.views-right{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.search-wrap{
+  position:relative;
+  display:flex;
+  align-items:center;
+}
+
+.search-icon{
+  position:absolute;
+  left:10px;
+  color: var(--muted);
+  font-size: 14px;
 }
 
 .input{
-  padding: 10px 12px;
+  padding: 10px 12px 10px 30px;
   border-radius: 12px;
   border: 1px solid var(--border);
   background: #0f1430;
   color: var(--text);
-  min-width: 260px;
+  min-width: 320px;
 }
 
 .btn{
@@ -148,18 +133,50 @@ body{
 .btn.ghost{background: rgba(255,255,255,0.04)}
 .btn.ghost:hover{background: rgba(255,255,255,0.08)}
 
-.table-wrap{
-  padding: 10px 12px 14px;
-  height: calc(100% - 92px);
+/* Panel */
+.panel{
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  overflow:hidden;
 }
 
-/* Tabulator readability + stop weird stretching */
+.panel-head{
+  background: var(--panel-header);
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-title h2{
+  margin:0;
+  font-size: 16px;
+  color:#fff;
+}
+.hint{
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.view-stack{ width:100%; }
+.view{ display:none; }
+.view.active{ display:block; }
+
+.table-wrap{
+  padding: 10px 12px 14px;
+  height: calc(100vh - 230px);
+  min-height: 520px;
+}
+
+/* Tabulator theme */
 .tabulator{
   background: #0f1430 !important;
   color: var(--text) !important;
   border: 1px solid var(--border) !important;
   border-radius: 14px;
   overflow: hidden;
+  width: 100% !important;
 }
 .tabulator-header{
   background: #1a2146 !important;
@@ -181,51 +198,10 @@ body{
 }
 .tabulator-footer{background:#141a2e !important; color:var(--muted) !important;}
 
-.hint{
-  margin-top: 12px;
-  text-align:center;
-  font-size: 12px;
-  color: var(--muted);
-}
-
-/* Mobile tweaks */
+/* Mobile */
 @media (max-width: 900px){
-  .wheel{height: calc(100vh - 140px); min-height: 520px;}
-  .input{min-width: 220px; width: 100%;}
-  .panel-label{display:none;}
-}
-
-/* Fix table width/gaps */
-.tabulator {
-  width: 100% !important;
-}
-
-.table-wrap {
-  width: 100%;
-}
-
-/* Make the active card truly centered with no extra side space */
-.track {
-  width: 100% !important;
-  max-width: 1100px;
-}
-
-/* Kill the “ghost column” / frozen divider artifacts */
-.tabulator .tabulator-frozen,
-.tabulator .tabulator-frozen-rows-holder,
-.tabulator .tabulator-frozen-cols-holder {
-  background: transparent !important;
-  box-shadow: none !important;
-  border: none !important;
-}
-
-.tabulator .tabulator-frozen-rows-holder:after,
-.tabulator .tabulator-frozen-cols-holder:after {
-  display: none !important;
-  content: none !important;
-}
-
-/* Also remove any column resize guide line if it’s sticking */
-.tabulator-col-resize-handle {
-  background: transparent !important;
+  .views-bar{flex-direction: column; align-items: stretch;}
+  .views-right{width:100%;}
+  .input{min-width: 0; width:100%;}
+  .table-wrap{height: calc(100vh - 320px); min-height: 480px;}
 }
