@@ -209,3 +209,23 @@ body{
   width: 100% !important;
   max-width: 1100px;
 }
+
+/* Kill the “ghost column” / frozen divider artifacts */
+.tabulator .tabulator-frozen,
+.tabulator .tabulator-frozen-rows-holder,
+.tabulator .tabulator-frozen-cols-holder {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.tabulator .tabulator-frozen-rows-holder:after,
+.tabulator .tabulator-frozen-cols-holder:after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Also remove any column resize guide line if it’s sticking */
+.tabulator-col-resize-handle {
+  background: transparent !important;
+}
