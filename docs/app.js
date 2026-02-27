@@ -8,14 +8,19 @@ function pct(x) {
   return (x * 100).toFixed(1) + "%";
 }
 
+/* ======================
+   TABLE BUILDERS
+   ====================== */
+
 function buildMoneylineTable(el, data) {
   return new Tabulator(el, {
     data,
-    layout: "fitColumns",
+    layout: "fitDataStretch",
+    responsiveLayout: "collapse",
     initialSort: [{ column: "home_win_prob", dir: "desc" }],
     columns: [
-      { title: "Away", field: "away" },
-      { title: "Home", field: "home" },
+      { title: "Away", field: "away", headerSort:true },
+      { title: "Home", field: "home", headerSort:true },
       {
         title: "Home Win %",
         field: "home_win_prob",
@@ -35,85 +40,53 @@ function buildMoneylineTable(el, data) {
 function buildLinesTable(el, data) {
   return new Tabulator(el, {
     data,
-    layout: "fitColumns",
+    layout: "fitDataStretch",
+    responsiveLayout: "collapse",
     initialSort: [{ column: "best_edge", dir: "desc" }],
     columns: [
-      { title: "Player", field: "Player" },
+      { title: "Player", field: "Player", minWidth: 140 },
       { title: "Team", field: "Team" },
       { title: "Opp", field: "Opponent" },
-      { title: "Line", field: "line" },
-      { title: "Side", field: "best_side" },
-      { title: "Model Prob", field: "best_prob", formatter: c => pct(c.getValue()) },
-      { title: "Edge", field: "best_edge", formatter: c => c.getValue().toFixed(3) },
-      { title: "Odds", field: "best_odds" },
-      { title: "EV / $1", field: "best_ev_$1", formatter: c => c.getValue().toFixed(3) }
+      { title: "Line", field: "line", hozAlign:"right" },
+      { title: "Model %", field: "best_prob", formatter:c=>pct(c.getValue()), hozAlign:"right" },
+      { title: "Edge", field: "best_edge", formatter:c=>c.getValue().toFixed(3), hozAlign:"right" },
+      { title: "EV / $1", field: "best_ev_$1", formatter:c=>c.getValue().toFixed(3), hozAlign:"right" }
     ]
   });
 }
 
-function attachLinesFilters(table, prefix) {
-  const search = document.getElementById(prefix + "Search");
-  const side = document.getElementById(prefix + "Side");
-  const minEdge = document.getElementById(prefix + "MinEdge");
-  const clear = document.getElementById(prefix + "Clear");
+/* ======================
+   SEARCH FILTERS ONLY
+   ====================== */
+
+function attachSearch(table, inputId, clearId, fields) {
+  const input = document.getElementById(inputId);
+  const clear = document.getElementById(clearId);
 
   function apply() {
-    const q = search.value.toLowerCase();
-    const s = side.value;
-    const me = Number(minEdge.value);
+    const q = input.value.toLowerCase().trim();
+    if (!q) {
+      table.clearFilter();
+      return;
+    }
 
     table.setFilter(row => {
-      if (row.best_edge < me) return false;
-      if (s && row.best_side !== s) return false;
-      if (!q) return true;
-      return `${row.Player} ${row.Team}`.toLowerCase().includes(q);
+      return fields.some(f =>
+        String(row[f] || "").toLowerCase().includes(q)
+      );
     });
   }
 
-  [search, side, minEdge].forEach(el =>
-    el.addEventListener("input", apply)
-  );
-
+  input.addEventListener("input", apply);
   clear.addEventListener("click", () => {
-    search.value = "";
-    side.value = "";
-    minEdge.value = "0.03";
+    input.value = "";
     table.clearFilter();
-    apply();
   });
-
-  apply();
 }
 
-function attachMoneylineFilters(table) {
-  const search = document.getElementById("mlSearch");
-  const minProb = document.getElementById("mlMinProb");
-  const clear = document.getElementById("mlClear");
-
-  function apply() {
-    const q = search.value.toLowerCase();
-    const mp = Number(minProb.value);
-
-    table.setFilter(row => {
-      if (row.ml_best_prob < mp) return false;
-      if (!q) return true;
-      return `${row.away} ${row.home} ${row.ml_best_team}`.toLowerCase().includes(q);
-    });
-  }
-
-  [search, minProb].forEach(el =>
-    el.addEventListener("input", apply)
-  );
-
-  clear.addEventListener("click", () => {
-    search.value = "";
-    minProb.value = "0.60";
-    table.clearFilter();
-    apply();
-  });
-
-  apply();
-}
+/* ======================
+   INIT
+   ====================== */
 
 async function init() {
   const moneyline = await loadJSON("./data/moneyline.json");
@@ -121,17 +94,17 @@ async function init() {
   const pa = await loadJSON("./data/pa_lines.json");
   const pra = await loadJSON("./data/pra_lines.json");
 
-  const mlTable = buildMoneylineTable("#tblMoneyline", moneyline);
-  attachMoneylineFilters(mlTable);
+  const ml = buildMoneylineTable("#tblMoneyline", moneyline);
+  attachSearch(ml, "mlSearch", "mlClear", ["away", "home"]);
 
-  const ptTable = buildLinesTable("#tblPoints", points);
-  attachLinesFilters(ptTable, "pt");
+  const pt = buildLinesTable("#tblPoints", points);
+  attachSearch(pt, "ptSearch", "ptClear", ["Player", "Team", "Opponent"]);
 
-  const paTable = buildLinesTable("#tblPA", pa);
-  attachLinesFilters(paTable, "pa");
+  const paT = buildLinesTable("#tblPA", pa);
+  attachSearch(paT, "paSearch", "paClear", ["Player", "Team", "Opponent"]);
 
-  const praTable = buildLinesTable("#tblPRA", pra);
-  attachLinesFilters(praTable, "pra");
+  const praT = buildLinesTable("#tblPRA", pra);
+  attachSearch(praT, "praSearch", "praClear", ["Player", "Team", "Opponent"]);
 }
 
 init();
