@@ -265,3 +265,58 @@ html, body {
   width: 100%;
   overflow-x: auto;
 }
+
+/* =========================
+   Mobile readability
+   ========================= */
+@media (max-width: 768px) {
+  /* More breathing room overall */
+  body {
+    font-size: 14px;
+  }
+
+  /* Make the top controls wrap instead of squish */
+  .topbar, .controls, .toolbar, .header-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  /* Buttons not tiny */
+  button, .tab-btn {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  /* Search input not tiny */
+  input, #globalSearch {
+    width: 100% !important;
+    font-size: 15px;
+    padding: 10px 12px;
+  }
+
+  /* Let tables scroll horizontally instead of shrinking text */
+  .view {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Tabulator: bigger text and more padding on mobile */
+  .tabulator {
+    font-size: 13px;
+  }
+
+  .tabulator .tabulator-cell {
+    padding: 10px 10px;
+  }
+
+  .tabulator .tabulator-header {
+    font-size: 12px;
+  }
+
+  /* Wrap header titles to multiple lines */
+  .tabulator .tabulator-col-title {
+    white-space: normal !important;
+    line-height: 1.15;
+  }
+}
