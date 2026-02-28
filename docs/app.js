@@ -117,6 +117,13 @@ function normalizeSpreads(rows) {
   });
 }
 
+function extractProbFromPick(txt) {
+  if (!txt) return "";
+  // supports "... p=0.823 ..." or "... p=0.82 ..."
+  const m = String(txt).match(/p\s*=\s*(0\.\d+)/i);
+  return m ? Number(m[1]) : "";
+}
+
 function normalizeProps(rows) {
   return (rows || []).map(r => ({
     Player: r.Player ?? "",
@@ -139,18 +146,23 @@ function normalizeProps(rows) {
     pick_moderate: r.pick_moderate ?? "",
     pick_risky: r.pick_risky ?? "",
 
-    // flame driver: if your picks include p=0.xxx, you could parse it.
-    // For now: no flame based on pick text; leaving blank is fine.
-    // We'll compute a simple proxy: if pick_conservative contains "p=0." parse it.
+    // flame driver: parse prob from conservative pick text
     best_prob_proxy: extractProbFromPick(r.pick_conservative),
   }));
 }
 
-function extractProbFromPick(txt) {
-  if (!txt) return "";
-  // supports "... p=0.823 ..." or "... p=0.82 ..."
-  const m = String(txt).match(/p\s*=\s*(0\.\d+)/i);
-  return m ? Number(m[1]) : "";
+/* =========================
+   TABULATOR DEFAULTS (mobile-friendly)
+   ========================= */
+
+function baseTableOptions() {
+  return {
+    responsiveLayout: "hide",                 // hide columns on small screens
+    responsiveLayoutCollapseStartOpen: false, // keep collapsed columns hidden
+    layout: "fitDataFill",                    // avoid squishing everything
+    height: "calc(100vh - 220px)",            // use most of the screen
+    placeholder: "No data available",
+  };
 }
 
 /* =========================
@@ -159,10 +171,8 @@ function extractProbFromPick(txt) {
 
 function buildMoneylineTable(el, data) {
   return new Tabulator(el, {
+    ...baseTableOptions(),
     data,
-    layout: "fitColumns",
-    responsiveLayout: false,
-    height: "100%",
     initialSort: [{ column: "ml_best_prob", dir: "desc" }],
     columns: [
       {
@@ -171,40 +181,41 @@ function buildMoneylineTable(el, data) {
         formatter: flameFormatter,
         headerFormatter: () => "",
         hozAlign: "center",
-        width: 50,
+        width: 46,
         headerSort: false,
+        responsive: 0,
       },
-      { title: "Date", field: "date", widthGrow: 1 },
-      { title: "Away", field: "away", widthGrow: 1 },
-      { title: "Home", field: "home", widthGrow: 1 },
 
-      { title: "Away ML", field: "away_ml", formatter: c => oddsFmt(c.getValue()), hozAlign: "right", widthGrow: 1 },
-      { title: "Home ML", field: "home_ml", formatter: c => oddsFmt(c.getValue()), hozAlign: "right", widthGrow: 1 },
+      // Keep the core stuff on mobile
+      { title: "Away", field: "away", widthGrow: 1, responsive: 0 },
+      { title: "Home", field: "home", widthGrow: 1, responsive: 0 },
+      { title: "Pick", field: "Model pick", widthGrow: 1, responsive: 0 },
 
-      { title: "Away Mkt %", field: "away_market_win_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1 },
-      { title: "Home Mkt %", field: "home_market_win_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1 },
+      { title: "Away Model %", field: "away_model_win_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1, responsive: 1 },
+      { title: "Home Model %", field: "home_model_win_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1, responsive: 1 },
 
-      { title: "Away Model %", field: "away_model_win_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1 },
-      { title: "Home Model %", field: "home_model_win_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1 },
+      // Drop these first on mobile
+      { title: "Date", field: "date", widthGrow: 1, responsive: 4 },
+      { title: "Away ML", field: "away_ml", formatter: c => oddsFmt(c.getValue()), hozAlign: "right", widthGrow: 1, responsive: 5 },
+      { title: "Home ML", field: "home_ml", formatter: c => oddsFmt(c.getValue()), hozAlign: "right", widthGrow: 1, responsive: 5 },
 
-      { title: "Away Edge", field: "away_ml_edge", formatter: c => num(c.getValue(), 3), hozAlign: "right", widthGrow: 1 },
-      { title: "Home Edge", field: "home_ml_edge", formatter: c => num(c.getValue(), 3), hozAlign: "right", widthGrow: 1 },
+      { title: "Away Mkt %", field: "away_market_win_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1, responsive: 6 },
+      { title: "Home Mkt %", field: "home_market_win_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1, responsive: 6 },
 
-      { title: "SD", field: "sd_margin", formatter: c => num(c.getValue(), 2), hozAlign: "right", widthGrow: 1 },
-      { title: "Away Pts", field: "away_proj_pts", formatter: c => num(c.getValue(), 1), hozAlign: "right", widthGrow: 1 },
-      { title: "Home Pts", field: "home_proj_pts", formatter: c => num(c.getValue(), 1), hozAlign: "right", widthGrow: 1 },
+      { title: "Away Edge", field: "away_ml_edge", formatter: c => num(c.getValue(), 3), hozAlign: "right", widthGrow: 1, responsive: 7 },
+      { title: "Home Edge", field: "home_ml_edge", formatter: c => num(c.getValue(), 3), hozAlign: "right", widthGrow: 1, responsive: 7 },
 
-      { title: "Model Pick", field: "Model pick", widthGrow: 1 },
+      { title: "SD", field: "sd_margin", formatter: c => num(c.getValue(), 2), hozAlign: "right", widthGrow: 1, responsive: 8 },
+      { title: "Away Pts", field: "away_proj_pts", formatter: c => num(c.getValue(), 1), hozAlign: "right", widthGrow: 1, responsive: 8 },
+      { title: "Home Pts", field: "home_proj_pts", formatter: c => num(c.getValue(), 1), hozAlign: "right", widthGrow: 1, responsive: 8 },
     ],
   });
 }
 
 function buildSpreadsTable(el, data) {
   return new Tabulator(el, {
+    ...baseTableOptions(),
     data,
-    layout: "fitColumns",
-    responsiveLayout: false,
-    height: "100%",
     initialSort: [{ column: "spread_best_prob", dir: "desc" }],
     columns: [
       {
@@ -213,43 +224,44 @@ function buildSpreadsTable(el, data) {
         formatter: flameFormatter,
         headerFormatter: () => "",
         hozAlign: "center",
-        width: 50,
+        width: 46,
         headerSort: false,
+        responsive: 0,
       },
-      { title: "Date", field: "date", widthGrow: 1 },
-      { title: "Away", field: "away", widthGrow: 1 },
-      { title: "Home", field: "home", widthGrow: 1 },
 
-      { title: "Away Spr", field: "away_spread", hozAlign: "right", widthGrow: 1 },
-      { title: "Home Spr", field: "home_spread", hozAlign: "right", widthGrow: 1 },
+      { title: "Away", field: "away", widthGrow: 1, responsive: 0 },
+      { title: "Home", field: "home", widthGrow: 1, responsive: 0 },
+      { title: "Pick", field: "Model pick", widthGrow: 1, responsive: 0 },
 
-      { title: "Mkt Cover %", field: "market_cover_prob_assumed", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1 },
-      { title: "Away Model %", field: "away_model_cover_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1 },
-      { title: "Home Model %", field: "home_model_cover_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1 },
+      // Tier picks: keep visible on mobile
+      { title: "Conservative", field: "pick_conservative", widthGrow: 2, responsive: 0 },
+      { title: "Moderate", field: "pick_moderate", widthGrow: 2, responsive: 1 },
+      { title: "Risky", field: "pick_risky", widthGrow: 2, responsive: 2 },
 
-      { title: "Away Edge", field: "away_spread_edge", formatter: c => num(c.getValue(), 3), hozAlign: "right", widthGrow: 1 },
-      { title: "Home Edge", field: "home_spread_edge", formatter: c => num(c.getValue(), 3), hozAlign: "right", widthGrow: 1 },
+      // Hide these earlier on mobile
+      { title: "Away Spr", field: "away_spread", hozAlign: "right", widthGrow: 1, responsive: 4 },
+      { title: "Home Spr", field: "home_spread", hozAlign: "right", widthGrow: 1, responsive: 4 },
 
-      { title: "Away Pts", field: "away_proj_pts", formatter: c => num(c.getValue(), 1), hozAlign: "right", widthGrow: 1 },
-      { title: "Home Pts", field: "home_proj_pts", formatter: c => num(c.getValue(), 1), hozAlign: "right", widthGrow: 1 },
-      { title: "Total", field: "total", formatter: c => num(c.getValue(), 1), hozAlign: "right", widthGrow: 1 },
+      { title: "Away Model %", field: "away_model_cover_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1, responsive: 5 },
+      { title: "Home Model %", field: "home_model_cover_prob", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1, responsive: 5 },
 
-      { title: "Model Pick", field: "Model pick", widthGrow: 1 },
+      { title: "Away Edge", field: "away_spread_edge", formatter: c => num(c.getValue(), 3), hozAlign: "right", widthGrow: 1, responsive: 6 },
+      { title: "Home Edge", field: "home_spread_edge", formatter: c => num(c.getValue(), 3), hozAlign: "right", widthGrow: 1, responsive: 6 },
 
-      { title: "Conservative", field: "pick_conservative", widthGrow: 2 },
-      { title: "Moderate", field: "pick_moderate", widthGrow: 2 },
-      { title: "Risky", field: "pick_risky", widthGrow: 2 },
+      { title: "Total", field: "total", formatter: c => num(c.getValue(), 1), hozAlign: "right", widthGrow: 1, responsive: 7 },
+
+      { title: "Date", field: "date", widthGrow: 1, responsive: 8 },
+      { title: "Mkt Cover %", field: "market_cover_prob_assumed", formatter: c => pct(c.getValue()), hozAlign: "right", widthGrow: 1, responsive: 9 },
+      { title: "Away Pts", field: "away_proj_pts", formatter: c => num(c.getValue(), 1), hozAlign: "right", widthGrow: 1, responsive: 10 },
+      { title: "Home Pts", field: "home_proj_pts", formatter: c => num(c.getValue(), 1), hozAlign: "right", widthGrow: 1, responsive: 10 },
     ],
   });
 }
 
 function buildPropsTable(el, data) {
   return new Tabulator(el, {
+    ...baseTableOptions(),
     data,
-    layout: "fitColumns",
-    responsiveLayout: false,
-    height: "100%",
-    // sort by proxy prob from conservative pick if present
     initialSort: [{ column: "best_prob_proxy", dir: "desc" }],
     columns: [
       {
@@ -258,28 +270,32 @@ function buildPropsTable(el, data) {
         formatter: flameFormatter,
         headerFormatter: () => "",
         hozAlign: "center",
-        width: 50,
+        width: 46,
         headerSort: false,
+        responsive: 0,
       },
-      { title: "Player", field: "Player", widthGrow: 1.5 },
-      { title: "Pos", field: "Position", widthGrow: 0.8 },
-      { title: "Team", field: "Team", widthGrow: 1 },
-      { title: "Opp", field: "Opponent", widthGrow: 1 },
-      { title: "DvP Rank", field: "dvp_rank_pos", hozAlign: "right", widthGrow: 1 },
 
-      { title: "Season Mean", field: "season_mean", formatter: c => num(c.getValue(), 2), hozAlign: "right", widthGrow: 1 },
+      // Keep key identifiers + tier picks on mobile
+      { title: "Player", field: "Player", widthGrow: 1.5, responsive: 0 },
+      { title: "Team", field: "Team", widthGrow: 1, responsive: 1 },
+      { title: "Opp", field: "Opponent", widthGrow: 1, responsive: 1 },
 
-      { title: "DK Line", field: "dk_line", hozAlign: "right", widthGrow: 1 },
-      { title: "DK O", field: "dk_odds_over", formatter: c => oddsFmt(c.getValue()), hozAlign: "right", widthGrow: 1 },
-      { title: "DK U", field: "dk_odds_under", formatter: c => oddsFmt(c.getValue()), hozAlign: "right", widthGrow: 1 },
+      { title: "Conservative", field: "pick_conservative", widthGrow: 2, responsive: 0 },
+      { title: "Moderate", field: "pick_moderate", widthGrow: 2, responsive: 1 },
+      { title: "Risky", field: "pick_risky", widthGrow: 2, responsive: 2 },
 
-      { title: "FD Line", field: "fd_line", hozAlign: "right", widthGrow: 1 },
-      { title: "FD O", field: "fd_odds_over", formatter: c => oddsFmt(c.getValue()), hozAlign: "right", widthGrow: 1 },
-      { title: "FD U", field: "fd_odds_under", formatter: c => oddsFmt(c.getValue()), hozAlign: "right", widthGrow: 1 },
+      // Less critical columns hide on mobile first
+      { title: "Pos", field: "Position", widthGrow: 0.8, responsive: 4 },
+      { title: "DvP", field: "dvp_rank_pos", hozAlign: "right", widthGrow: 0.9, responsive: 5 },
+      { title: "Season", field: "season_mean", formatter: c => num(c.getValue(), 2), hozAlign: "right", widthGrow: 1, responsive: 6 },
 
-      { title: "Conservative", field: "pick_conservative", widthGrow: 2 },
-      { title: "Moderate", field: "pick_moderate", widthGrow: 2 },
-      { title: "Risky", field: "pick_risky", widthGrow: 2 },
+      { title: "DK L", field: "dk_line", hozAlign: "right", widthGrow: 1, responsive: 7 },
+      { title: "DK O", field: "dk_odds_over", formatter: c => oddsFmt(c.getValue()), hozAlign: "right", widthGrow: 1, responsive: 8 },
+      { title: "DK U", field: "dk_odds_under", formatter: c => oddsFmt(c.getValue()), hozAlign: "right", widthGrow: 1, responsive: 8 },
+
+      { title: "FD L", field: "fd_line", hozAlign: "right", widthGrow: 1, responsive: 7 },
+      { title: "FD O", field: "fd_odds_over", formatter: c => oddsFmt(c.getValue()), hozAlign: "right", widthGrow: 1, responsive: 8 },
+      { title: "FD U", field: "fd_odds_under", formatter: c => oddsFmt(c.getValue()), hozAlign: "right", widthGrow: 1, responsive: 8 },
     ],
   });
 }
@@ -300,7 +316,6 @@ function applyGlobalSearch(query) {
   }
 
   activeTable.setFilter(row => {
-    // Search across common fields from all tables
     const keys = [
       "Player", "Team", "Opponent", "Position",
       "away", "home",
